@@ -49,8 +49,8 @@ h1 {
 }
 
 /* Adjust the image size */
-.card img {
-    width: 100%; /* Make the image fill the width of the card */
+.card-img {
+    width: 50%; /* Make the image fill the width of the card */
     height: 100%; /* Make the image fill the height of the card */
     object-fit: cover; /* Ensure the image covers the area without stretching */
 }
