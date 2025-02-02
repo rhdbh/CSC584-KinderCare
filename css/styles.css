@@ -15,13 +15,13 @@ body, html {
 /* Container styling */
 .container {
     background: #fff;
-    padding: 30px;
+    padding: 100px;
     border-radius: 8px;
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width: 1200px; /* Adjusted for larger container needs */
     text-align: center;
-    position: center; /* Allow positioning of elements like logout button */
+    position: relative; /* Allow positioning of elements like logout button */
 }
 
 /* Text styling */
