@@ -1,5 +1,5 @@
 // register.js
-import { auth, db } from "./firebase.js";
+import { auth, User } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -28,7 +28,6 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
         window.location.href = "login.html";
     } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
-            // Display an error message when the email is already in use
             errorMessage.textContent = "This email is already in use. Please try logging in or use a different email.";
         } else {
             // Display any other errors
