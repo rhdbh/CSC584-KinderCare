@@ -1,5 +1,5 @@
 // register.js
-import { auth, User } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -18,11 +18,10 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
         const user = userCredential.user;  // Firebase user object
 
         // Save user data in Firestore
-        await setDoc(doc(db, "user", user.userID), {
+        await setDoc(doc(db, "users", user.uid), {
             userName: userName,   // Full Name
             email: email,         // Email
-            password: password,         // Email 
-            phoneNumber: phoneNumber    // Phone Number
+            phoneNumber: phone    // Phone Number
         });
 
         alert("Registration successful!");
