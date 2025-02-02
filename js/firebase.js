@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
   authDomain: "kindercare-cd7da.firebaseapp.com",
@@ -12,8 +13,7 @@ const firebaseConfig = {
   appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-
-// Initialize Firestore
-export const db = getFirestore(app);
+export const db = getFirestore(app);  // Firestore instance
