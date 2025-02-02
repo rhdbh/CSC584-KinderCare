@@ -1,4 +1,5 @@
-import { auth, db } from "./firebase.js"; 
+// register.js
+import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -12,20 +13,21 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
     const errorMessage = document.getElementById("error-message");
 
     try {
+        // Register user with email and password
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        const user = userCredential.user;  // Firebase user object
 
-        // Store user data in Firestore
+        // Save user data in Firestore
         await setDoc(doc(db, "users", user.uid), {
-            userName,
-            email,
-            phone
+            userName: userName,   // Full Name
+            email: email,         // Email
+            phoneNumber: phone    // Phone Number
         });
 
         alert("Registration successful!");
         window.location.href = "login.html";
-
     } catch (error) {
+        // Handle registration errors
         errorMessage.textContent = error.message;
         errorMessage.style.display = "block";
     }
