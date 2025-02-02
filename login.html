@@ -28,6 +28,13 @@
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
+            // Check if email or password is empty
+            if (!email || !password) {
+                document.getElementById("error-message").textContent = "Email and password cannot be empty.";
+                document.getElementById("error-message").style.display = "block";
+                return;
+            }
+
             // Firebase Authentication for login
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
@@ -37,7 +44,9 @@
                     window.location.href = "dashboard.html";  // Redirect to dashboard
                 })
                 .catch((error) => {
-                    document.getElementById("error-message").textContent = error.message;  // Show error message
+                    // Display error message
+                    console.error("Login error:", error);  // Log the error for debugging
+                    document.getElementById("error-message").textContent = "Invalid email or password!";
                     document.getElementById("error-message").style.display = "block";
                 });
         });
