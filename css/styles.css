@@ -38,24 +38,21 @@ h1 {
     gap: 20px; /* Space between cards */
 }
 
+/* Adjust the card container */
 .card {
-    width: 250px; /* Adjust the width as needed */
+    width: 250px;  /* Set a fixed width for the card */
+    height: 100px; /* Set a fixed height for the card */
     margin: 10px;
     text-align: center;
+    overflow: hidden; /* Hide anything that exceeds the card boundaries */
+    position: relative;
 }
 
+/* Adjust the image size */
 .card img {
-    width: 100%;      /* Ensure the image fills the width of the card */
-    height: auto;     /* Maintain aspect ratio */
-    max-height: 150px; /* Optional: limit the height of the image */
+    width: 100%; /* Make the image fill the width of the card */
+    height: 100%; /* Make the image fill the height of the card */
     object-fit: cover; /* Ensure the image covers the area without stretching */
-}
-
-/* Links inside cards */
-.card h3 {
-    font-size: 16px;
-    margin-top: 10px;
-    text-transform: uppercase;
 }
 
 /* Card hover effect */
