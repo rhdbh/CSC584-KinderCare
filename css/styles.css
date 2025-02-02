@@ -34,7 +34,6 @@ h1 {
 /* Dashboard content styling */
 .dashboard-content {
     display: flex;
-    flex-wrap: wrap;
     justify-content: center;
     gap: 20px; /* Space between cards */
 }
