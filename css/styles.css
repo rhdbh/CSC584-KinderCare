@@ -23,19 +23,12 @@ body, html {
     max-width: 1200px; /* Adjusted for larger container needs */
     text-align: center;
     position: relative; /* Allow positioning of elements like logout button */
-}
+}    
 
 /* Text styling */
 h1 {
     color: #333;
     margin-bottom: 20px;
-}
-
-/* Dashboard content styling */
-.dashboard-content {
-    display: flex;
-    justify-content: center;
-    gap: 20px; /* Space between cards */
 }
 
 /* Adjust the card container */
