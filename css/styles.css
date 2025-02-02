@@ -22,14 +22,39 @@ body, html {
     width: 100%;
     max-width: 1200px; /* Adjusted for larger container needs */
     text-align: center;
-    position: relative;
-    margin-top: 10px; /* Added top margin to separate from the top */
+    position: relative; /* Allow positioning of elements like logout button */
 }
 
 /* Text styling */
 h1 {
     color: #333;
     margin-bottom: 20px;
+}
+
+/* Button styles */
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+    background-color: #007BFF;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.button-secondary {
+    background-color: #6c757d;
+}
+
+.button-secondary:hover {
+    background-color: #5a6268;
 }
 
 /* Logout button styling */
@@ -49,43 +74,33 @@ h1 {
     background-color: #cc3b3b;
 }
 
-/* Dashboard content styling */
-.dashboard-content {
+/* Form styles */
+form {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* Card styles */
-.card {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
-    width: 200px; /* Set a fixed width */
-    text-align: center;
-    padding: 15px;
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
 }
 
-.card-img {
-    width: 100%; /* Ensure image fills the card */
-    max-width: 150px; /* Limit image size */
-    height: auto;
-    object-fit: contain;
-}
-
-/* Text styles inside card */
-.card h3 {
+input {
+    width: 90%;
+    max-width: 300px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
     font-size: 16px;
-    margin-top: 10px;
 }
 
-.card a {
-    text-decoration: none;
-    color: #007BFF;
-}
-
-.card a:hover {
-    text-decoration: underline;
-}
+textarea {
+    width: 90%;
+    max-width: 300px;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16
