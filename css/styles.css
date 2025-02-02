@@ -40,7 +40,7 @@ h1 {
 
 /* Adjust the card container */
 .card {
-    width: 250px;  /* Set a fixed width for the card */
+    width: 100px;  /* Set a fixed width for the card */
     height: 100px; /* Set a fixed height for the card */
     margin: 10px;
     text-align: center;
@@ -49,10 +49,10 @@ h1 {
 }
 
 /* Adjust the image size */
-.card-img {
-    width: 50%; /* Make the image fill the width of the card */
-    height: 100%; /* Make the image fill the height of the card */
-    object-fit: cover; /* Ensure the image covers the area without stretching */
+.card img {
+    width: 100%;  /* Make the image fill the width of the card */
+    height: auto; /* Maintain aspect ratio of the image */
+    object-fit: contain; /* Ensure the image stays contained without cropping */
 }
 
 /* Card hover effect */
