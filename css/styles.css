@@ -31,30 +31,6 @@ h1 {
     margin-bottom: 20px;
 }
 
-.card {
-    width: 100px; /* Adjust the width of the card to control the size of the image */
-    height: 100px; /* Adjust the height to control the overall card size */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    margin: 10px;
-    background: #f4f4f4;
-    border-radius: 8px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.card-img {
-    width: 30%; /* Ensure the image fills the width of the card */
-    height: 50px; /* Set the height of the image */
-    object-fit: cover; /* Resize the image while maintaining the aspect ratio */
-    border-radius: 8px; /* Optional: Rounded corners for the image */
-    margin-bottom: 15px; /* Add space between the image and the text */
-}
-
-
 /* Button styles */
 .button {
     display: inline-block;
