@@ -1,6 +1,7 @@
-import { auth, users } from "./firebase.js";  // Make sure db is imported correctly
+// register.js
+import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.getElementById("registrationForm").addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -24,14 +25,10 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
         });
 
         alert("Registration successful!");
-        window.location.href = "login.html";  // Redirect to login page after registration
+        window.location.href = "login.html";
     } catch (error) {
         // Handle registration errors
-        if (error.code === 'auth/email-already-in-use') {
-            errorMessage.textContent = "This email is already in use. Please try logging in or use a different email.";
-        } else {
-            errorMessage.textContent = error.message;
-        }
-        errorMessage.style.display = "block";  // Display error message
+        errorMessage.textContent = error.message;
+        errorMessage.style.display = "block";
     }
 });
