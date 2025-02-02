@@ -13,7 +13,7 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
     const errorMessage = document.getElementById("error-message");
 
     try {
-        // Attempt to register user with email and password
+        // Register user with email and password
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;  // Firebase user object
 
@@ -27,12 +27,8 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
         alert("Registration successful!");
         window.location.href = "login.html";
     } catch (error) {
-        if (error.code === 'auth/email-already-in-use') {
-            errorMessage.textContent = "This email is already in use. Please try logging in or use a different email.";
-        } else {
-            // Display any other errors
-            errorMessage.textContent = error.message;
-        }
+        // Handle registration errors
+        errorMessage.textContent = error.message;
         errorMessage.style.display = "block";
     }
 });
