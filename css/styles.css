@@ -57,7 +57,7 @@ h1 {
 /* Image inside the card */
 .card-img {
     width: 80%; /* Make the image take up 80% of the card width */
-    height: 140px; /* Set a fixed height for the image */
+    height: 10px; /* Set a fixed height for the image */
     object-fit: contain; /* Resize image while maintaining aspect ratio */
     border-radius: 8px; /* Optional: Round the corners of the image */
     margin-bottom: 15px; /* Space between image and text */
