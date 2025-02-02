@@ -18,7 +18,7 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
         const user = userCredential.user;  // Firebase user object
 
         // Save user data in Firestore
-        await setDoc(doc(db, "users", user.uid), {
+        await setDoc(doc(db, "user", user.userID), {
             userName: userName,   // Full Name
             email: email,         // Email
             password: password,         // Email 
