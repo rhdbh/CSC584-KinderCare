@@ -28,41 +28,52 @@
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
-            // Clear the previous error message
+            // Clear previous error message
             document.getElementById("error-message").style.display = "none";
 
-            // Firebase Authentication for login
+            // Attempt login
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    sessionStorage.setItem("user_id", user.uid);  // Store user ID in sessionStorage
+                    console.log("Login successful:", user.email);
+
+                    // Store session info
+                    sessionStorage.setItem("user_id", user.uid);
                     sessionStorage.setItem("username", user.email);  // Store email as username
                     window.location.href = "dashboard.html";  // Redirect to dashboard
                 })
                 .catch((error) => {
-                    // Display error message only if the login fails
-                    console.error("Login error:", error.message);  // Log the error for debugging
-                    document.getElementById("error-message").textContent = "Invalid email or password!";
+                    // Log the error details for debugging
+                    console.error("Login error:", error.code, error.message);
+
+                    // Display specific error message based on the error code
+                    if (error.code === "auth/wrong-password") {
+                        document.getElementById("error-message").textContent = "Incorrect password!";
+                    } else if (error.code === "auth/user-not-found") {
+                        document.getElementById("error-message").textContent = "No user found with this email!";
+                    } else {
+                        document.getElementById("error-message").textContent = "An error occurred. Please try again.";
+                    }
+
                     document.getElementById("error-message").style.display = "block";
                 });
         });
     </script>
-
 </head>
 <body>
     <div class="container">
         <h1>Login | KinderCare</h1>
         <p>Please enter your email and password to login.</p>
-        
+
         <p id="error-message" style="color: red; display: none;"></p>
 
         <form id="loginForm">
             <label for="email">Email</label>
             <input type="email" id="email" name="email" placeholder="Enter your email" required>
-            
+
             <label for="password">Password</label>
             <input type="password" id="password" name="password" placeholder="Enter your password" required>
-            
+
             <button type="submit" class="form-button">Login</button>
         </form>
 
