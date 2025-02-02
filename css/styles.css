@@ -10,7 +10,7 @@ body, html {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100px;
+    height: 100vh;
 }
 
 /* Container styling */
@@ -23,34 +23,12 @@ body, html {
     max-width: 1200px; /* Adjusted for larger container needs */
     text-align: center;
     position: relative; /* Allow positioning of elements like logout button */
-}    
+}
 
 /* Text styling */
 h1 {
     color: #333;
     margin-bottom: 20px;
-}
-
-/* Adjust the card container */
-.card {
-    width: 250px;  /* Set a fixed width for the card */
-    height: 250px; /* Set a fixed height for the card */
-    margin: 10px;
-    text-align: center;
-    overflow: hidden; /* Hide anything that exceeds the card boundaries */
-    position: relative;
-}
-
-/* Adjust the image size */
-.card img {
-    width: 100%;  /* Make the image fill the width of the card */
-    height: auto; /* Maintain aspect ratio of the image */
-    object-fit: contain; /* Ensure the image stays contained without cropping */
-}
-
-/* Card hover effect */
-.card:hover {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* Button styles */
