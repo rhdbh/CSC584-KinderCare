@@ -82,10 +82,9 @@
             const user = users.find(u => u.email === email);
 
             if (user && user.password === password) {
-                // Simulating successful login
                 sessionStorage.setItem("user_id", user.userId);
                 sessionStorage.setItem("username", user.username);
-                window.location.href = "dashboard.html";  // Redirect to dashboard page
+                window.location.href = "dashboard.html";
             } else {
                 document.getElementById("error-message").textContent = "Invalid email or password!";
                 document.getElementById("error-message").style.display = "block";
