@@ -7,9 +7,14 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Logout button -->
     <button class="logout-button" onclick="window.location.href='logout.html'">Logout</button>
+    
+    <!-- Main container -->
     <div class="container">
-        <h1>Welcome, <span id="username"></span>!</h1> <!-- Placeholder for the username -->
+        <h1>Welcome, <span id="username"></span>!</h1> <!-- Display the username -->
+
+        <!-- Dashboard content -->
         <div class="dashboard-content">
             <div class="card">
                 <img src="img/children.png" alt="Children" class="card-img">
@@ -34,13 +39,14 @@
         </div>
     </div>
 
+    <!-- JavaScript to display the username dynamically -->
     <script>
-        // Assuming you're storing the username in sessionStorage after login
-        const username = sessionStorage.getItem("username");
+        // Get the username from sessionStorage (assuming it's set during login)
+        const username = sessionStorage.getItem('username');
         if (username) {
-            document.getElementById("username").textContent = username;
+            document.getElementById('username').textContent = username;
         } else {
-            window.location.href = "login.html";  // Redirect to login if no username
+            window.location.href = 'login.html'; // Redirect to login if not found
         }
     </script>
 </body>
