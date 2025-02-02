@@ -23,7 +23,7 @@ body, html {
     max-width: 1200px; /* Adjusted for larger container needs */
     text-align: center;
     position: relative;
-    margin-top: 250px; /* Added top margin to separate from the top */
+    margin-top: 10px; /* Added top margin to separate from the top */
 }
 
 /* Text styling */
