@@ -3,7 +3,7 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+  apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
   authDomain: "kindercare-cd7da.firebaseapp.com",
   projectId: "kindercare-cd7da",
   storageBucket: "kindercare-cd7da.firebasestorage.app",
@@ -12,4 +12,6 @@ apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
 };
 
 const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
+export const db = getFirestore(app); 
