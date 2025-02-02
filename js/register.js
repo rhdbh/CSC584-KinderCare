@@ -1,8 +1,9 @@
 // register.js
-import { auth, users } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// Menangani event submit
 document.getElementById("registrationForm").addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -13,21 +14,21 @@ document.getElementById("registrationForm").addEventListener("submit", async fun
     const errorMessage = document.getElementById("error-message");
 
     try {
-        // Register user with email and password
+        // Mendaftar pengguna dengan email dan password
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;  // Firebase user object
+        const user = userCredential.user;  // Objek pengguna Firebase
 
-        // Save user data in Firestore
+        // Menyimpan data pengguna dalam Firestore
         await setDoc(doc(db, "users", user.uid), {
-            userName: userName,   // Full Name
-            email: email,         // Email
-            phoneNumber: phone    // Phone Number
+            userName: userName,    // Nama penuh pengguna
+            email: email,          // Emel pengguna
+            phoneNumber: phone     // Nombor telefon pengguna
         });
 
-        alert("Registration successful!");
-        window.location.href = "login.html";
+        alert("Pendaftaran berjaya!");
+        window.location.href = "login.html";  // Redirect ke halaman login selepas pendaftaran berjaya
     } catch (error) {
-        // Handle registration errors
+        // Menangani ralat pendaftaran
         errorMessage.textContent = error.message;
         errorMessage.style.display = "block";
     }
