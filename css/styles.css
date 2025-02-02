@@ -32,8 +32,8 @@ h1 {
 }
 
 .card {
-    width: 250px; /* Adjust the width of the card to control the size of the image */
-    height: 350px; /* Adjust the height to control the overall card size */
+    width: 100px; /* Adjust the width of the card to control the size of the image */
+    height: 100px; /* Adjust the height to control the overall card size */
     display: flex;
     flex-direction: column;
     justify-content: center;
