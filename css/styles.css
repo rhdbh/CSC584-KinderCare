@@ -31,23 +31,6 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* Adjust the card container */
-.card {
-    width: 100px;  /* Set a fixed width for the card */
-    height: 100px; /* Set a fixed height for the card */
-    margin: 10px;
-    text-align: center;
-    overflow: hidden; /* Hide anything that exceeds the card boundaries */
-    position: relative;
-}
-
-/* Adjust the image size */
-.card img {
-    width: 100%;  /* Make the image fill the width of the card */
-    height: auto; /* Maintain aspect ratio of the image */
-    object-fit: contain; /* Ensure the image stays contained without cropping */
-}
-
 /* Button styles */
 .button {
     display: inline-block;
