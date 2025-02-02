@@ -8,9 +8,9 @@ body, html {
     background-size: cover;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* Align top instead of center */
     align-items: center;
-    height: 100vh;
+    overflow: auto; /* Allow scrolling if content exceeds viewport */
 }
 
 /* Container styling */
@@ -22,39 +22,14 @@ body, html {
     width: 100%;
     max-width: 1200px; /* Adjusted for larger container needs */
     text-align: center;
-    position: relative; /* Allow positioning of elements like logout button */
+    position: relative;
+    margin-top: 50px; /* Added top margin to separate from the top */
 }
 
 /* Text styling */
 h1 {
     color: #333;
     margin-bottom: 20px;
-}
-
-/* Button styles */
-.button {
-    display: inline-block;
-    padding: 10px 20px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    text-decoration: none;
-    color: #fff;
-    background-color: #007BFF;
-}
-
-.button:hover {
-    background-color: #0056b3;
-}
-
-.button-secondary {
-    background-color: #6c757d;
-}
-
-.button-secondary:hover {
-    background-color: #5a6268;
 }
 
 /* Logout button styling */
@@ -74,34 +49,43 @@ h1 {
     background-color: #cc3b3b;
 }
 
-/* Form styles */
-form {
+/* Dashboard content styling */
+.dashboard-content {
     display: flex;
-    flex-direction: column;
-    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
 }
 
-label {
-    margin-bottom: 5px;
-    font-weight: bold;
+/* Card styles */
+.card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+    width: 200px; /* Set a fixed width */
+    text-align: center;
+    padding: 15px;
 }
 
-input {
-    width: 90%;
-    max-width: 300px;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.card-img {
+    width: 100%; /* Ensure image fills the card */
+    max-width: 150px; /* Limit image size */
+    height: auto;
+    object-fit: contain;
+}
+
+/* Text styles inside card */
+.card h3 {
     font-size: 16px;
+    margin-top: 10px;
 }
 
-textarea {
-    width: 90%;
-    max-width: 300px;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+.card a {
+    text-decoration: none;
+    color: #007BFF;
+}
+
+.card a:hover {
+    text-decoration: underline;
 }
