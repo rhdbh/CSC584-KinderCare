@@ -38,28 +38,17 @@ h1 {
     gap: 20px; /* Space between cards */
 }
 
-/* Card styles */
 .card {
-    width: 200px; /* Adjust the width of the card */
-    height: 280px; /* Adjust the height of the card */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 15px;
-    background: #f4f4f4;
-    border-radius: 8px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    width: 250px; /* Adjust the width as needed */
+    margin: 10px;
     text-align: center;
 }
 
-/* Image inside the card */
-.card-img {
-    width: 80%; /* Make the image take up 80% of the card width */
-    height: 10px; /* Set a fixed height for the image */
-    object-fit: contain; /* Resize image while maintaining aspect ratio */
-    border-radius: 8px; /* Optional: Round the corners of the image */
-    margin-bottom: 15px; /* Space between image and text */
+.card img {
+    width: 100%;      /* Ensure the image fills the width of the card */
+    height: auto;     /* Maintain aspect ratio */
+    max-height: 150px; /* Optional: limit the height of the image */
+    object-fit: cover; /* Ensure the image covers the area without stretching */
 }
 
 /* Links inside cards */
