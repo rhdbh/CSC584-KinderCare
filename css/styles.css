@@ -8,9 +8,9 @@ body, html {
     background-size: cover;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Align top instead of center */
+    justify-content: center;
     align-items: center;
-    overflow: auto; /* Allow scrolling if content exceeds viewport */
+    height: 100vh;
 }
 
 /* Container styling */
