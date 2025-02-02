@@ -1,4 +1,4 @@
-/* General styles for body and html */
+	/* General styles for body and html */
 body, html {
     margin: 0;
     padding: 0;
@@ -22,7 +22,8 @@ body, html {
     width: 100%;
     max-width: 1200px; /* Adjusted for larger container needs */
     text-align: center;
-    position: relative; /* Allow positioning of elements like logout button */
+    position: relative;
+    margin-top: 100px; /* Added top margin to separate from the top */
 }
 
 /* Text styling */
