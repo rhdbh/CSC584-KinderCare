@@ -5,94 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Children Dashboard | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-    <!-- Firebase SDK -->
+    
     <script type="module">
-        // Import Firebase modules
+        
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase configuration (Replace with your actual Firebase credentials)
-const firebaseConfig = {
-  apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
-  authDomain: "kindercare-cd7da.firebaseapp.com",
-  projectId: "kindercare-cd7da",
-  storageBucket: "kindercare-cd7da.firebasestorage.app",
-  messagingSenderId: "930908122510",
-  appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
-};
-        // Initialize Firebase and Firestore
+    const firebaseConfig = {
+          apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+          authDomain: "kindercare-cd7da.firebaseapp.com",
+          projectId: "kindercare-cd7da",
+          storageBucket: "kindercare-cd7da.firebasestorage.app",
+          messagingSenderId: "930908122510",
+          appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+    };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Function to fetch and display children data
-        async function fetchChildren() {
+        // Function to load children from Firestore
+        async function loadChildren() {
             const childrenTable = document.getElementById("childrenTable");
-            childrenTable.innerHTML = ""; // Clear existing table data
+            childrenTable.innerHTML = ""; // Clear existing table rows
 
-            try {
-                const querySnapshot = await getDocs(collection(db, "children"));
+            const querySnapshot = await getDocs(collection(db, "children"));
+            querySnapshot.forEach((docSnap) => {
+                const child = docSnap.data();
+                const childId = docSnap.id;
 
-                if (querySnapshot.empty) {
-                    childrenTable.innerHTML = `<tr><td colspan="5">No child found.</td></tr>`;
-                    return;
-                }
-
-                querySnapshot.forEach((docSnapshot) => {
-                    const child = docSnapshot.data();
-                    const childId = docSnapshot.id;
-                    const row = document.createElement("tr");
-
-                    row.innerHTML = `
-                        <td>${child.ChildName}</td>
-                        <td>${child.DateOfBirth}</td>
-                        <td>${calculateAge(child.DateOfBirth)}</td>
-                        <td>${child.Gender}</td>
-                        <td>
-                            <button class="edit-button" onclick="editChild('${childId}')">✏️ Edit</button>
-                            <button class="delete-button" onclick="deleteChild('${childId}')">🗑️ Delete</button>
-                        </td>
-                    `;
-
-                    childrenTable.appendChild(row);
-                });
-            } catch (error) {
-                console.error("Error fetching children data:", error);
-            }
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${child.ChildName}</td>
+                    <td>${child.DateOfBirth}</td>
+                    <td>${calculateAge(child.DateOfBirth)}</td>
+                    <td>${child.Gender}</td>
+                    <td>
+                        <button class="edit-button" onclick="editChild('${childId}')">✏️ Edit</button>
+                        <button class="delete-button" onclick="deleteChild('${childId}')">🗑️ Delete</button>
+                    </td>
+                `;
+                childrenTable.appendChild(row);
+            });
         }
 
-        // Function to calculate age from birth date
-        function calculateAge(birthDate) {
-            const dob = new Date(birthDate);
+        function calculateAge(dob) {
+            const birthDate = new Date(dob);
             const today = new Date();
-            let age = today.getFullYear() - dob.getFullYear();
-            const monthDiff = today.getMonth() - dob.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
                 age--;
             }
             return age;
         }
 
-        // Function to delete a child
         async function deleteChild(childId) {
-            const confirmation = confirm("Are you sure you want to delete this child?");
-            if (!confirmation) return;
-
-            try {
-                await deleteDoc(doc(db, "children", childId));
-                alert("Child deleted successfully!");
-                fetchChildren(); // Refresh table after deletion
-            } catch (error) {
-                console.error("Error deleting child:", error);
+            const confirmDelete = confirm("Are you sure you want to delete this child?");
+            if (confirmDelete) {
+                try {
+                    await deleteDoc(doc(db, "children", childId));
+                    alert("Child deleted successfully.");
+                    loadChildren();
+                } catch (error) {
+                    console.error("Error deleting child:", error);
+                }
             }
         }
 
-        // Function to edit a child (redirects to edit page)
+        // Function to navigate to edit page
         function editChild(childId) {
             window.location.href = `edit-child.html?id=${childId}`;
         }
 
-        // Load children data when page loads
-        document.addEventListener("DOMContentLoaded", fetchChildren);
+        document.addEventListener("DOMContentLoaded", loadChildren);
         window.deleteChild = deleteChild;
         window.editChild = editChild;
     </script>
@@ -110,12 +94,11 @@ const firebaseConfig = {
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="childrenTable">
-            </tbody>
+            <tbody id="childrenTable"></tbody>
         </table>
         <br>
-        <button class="back-button" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
-        <button class="button" onclick="window.location.href='add-children.html'">+ Add New Children</button>
+        <button class="button" onclick="window.location.href='add-children.html'">+ Add New Child</button>
+        <button class="button" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
     </div>
 </body>
 </html>
