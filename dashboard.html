@@ -62,7 +62,19 @@
         <p><b>GROWTH</b></p>
     </div>
 </div>
-
+<script>
+        // Get the username from sessionStorage (assuming it's set during login)
+        const username = sessionStorage.getItem('username');
+        if (username) {
+            document.getElementById('userName').textContent = username;
+        if (username) {
+            document.getElementById('userName').textContent = username;
+        } else {
+            window.location.href = 'login.html'; // Redirect to login if not found
+        }
+    </script>
+</body>
+</html>
     </div>
 </body>
 </html>
