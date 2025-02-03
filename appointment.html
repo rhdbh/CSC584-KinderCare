@@ -1,222 +1,125 @@
-<div class="formbold-main-wrapper">
-  <div class="formbold-form-wrapper">
-      <div class="formbold-mb-5">
-          <div class="container">
-              <h1 style="text-align: center;">Book Appointment | KinderCare</h1>
-              <br>
-              <p>Please fill in the details below to book appointment.</p>
-              <br>
-              <label class="formbold-form-label formbold-form-label-2">Children ID Number</label>
-              <p>Please choose correct children ID number:</p>
-              <br>
-              <select id="child" name="child">                       
-                  <option value="select">Select children ID number</option>
-                  <!-- Add options for children IDs -->
-                  <option value="123">Child 123</option>
-                  <option value="124">Child 124</option>
-                  <option value="125">Child 125</option>
-              </select>
-          </div>
-          <br>
-          <div class="formbold-mb-5">
-              <label class="formbold-form-label formbold-form-label-2">Choose Appointment</label>
-              <form id="appointmentForm">
-                  <input type="radio" id="vaccination" name="appointment" value="vaccination">
-                  <label for="vaccination">Vaccination</label>
-                  <input type="radio" id="baby_checkup" name="appointment" value="baby_checkup">
-                  <label for="baby_checkup">Baby Checkup</label><br>
-          </div>
-          <br>
-          <div class="formbold-mb-5">
-              <label class="formbold-form-label formbold-form-label-2">Healthcare Provider</label>
-              <input
-                  type="text"
-                  name="healthcare"
-                  id="healthcare"
-                  placeholder="Insert your healthcare provider"
-                  class="formbold-form-input"
-              />
-          </div>
-          <br>
-          <div class="flex flex-wrap formbold--mx-3">
-              <div class="w-full sm:w-half formbold-px-3">
-                  <div class="formbold-mb-5 w-full">
-                      <label class="formbold-form-label formbold-form-label-2">Date</label>
-                      <input
-                          type="date"
-                          name="date"
-                          id="date"
-                          class="formbold-form-input" />
-                  </div>
-                  <br>
-              </div>
-              <div class="w-full sm:w-half formbold-px-3">
-                  <div class="formbold-mb-5">
-                      <label class="formbold-form-label formbold-form-label-2">Time</label>
-                      <input
-                          type="time"
-                          name="time"
-                          id="time"
-                          class="formbold-form-input"
-                      />
-                  </div>
-              </div>
-          </div>
+<?php
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "kindercare";
 
-          <div>
-              <button type="submit" class="formbold-btn">Proceed</button>
-          </div>
-          <br>
-          <div>
-              <button type="reset" class="formbold-btn2">Cancel</button>
-          </div>
-  </div>
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $child = $_POST['child'];
+    $appointmentType = $_POST['appointment'];
+    $healthcareProvider = $_POST['healthcare'];
+    $date = $_POST['date'];
+    $time = $_POST['time'];
+
+    // Use Prepared Statements to prevent SQL injection
+    $stmt = $conn->prepare("INSERT INTO appointments (child_id, appointment_type, healthcare_provider, date, time) VALUES (?, ?, ?, ?, ?)");
+    $stmt->bind_param("sssss", $child, $appointmentType, $healthcareProvider, $date, $time);
+
+    if ($stmt->execute()) {
+        echo "<script>alert('Appointment booked successfully!'); window.location.href='editdelete.html';</script>";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
+
+$conn->close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Appointment | KinderCare</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            border: none;
+            background-color: #6a64f1;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #5753d9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Book Appointment | KinderCare</h1>
+    <p>Please fill in the details below to book an appointment.</p>
+
+    <form action="" method="POST">
+        <label for="child">Children ID Number:</label>
+        <select id="child" name="child" required>                       
+            <option value="">Select children ID number</option>
+            <option value="123">Child 123</option>
+            <option value="124">Child 124</option>
+            <option value="125">Child 125</option>
+        </select>
+
+        <label>Choose Appointment:</label>
+        <input type="radio" id="vaccination" name="appointment" value="Vaccination" required>
+        <label for="vaccination">Vaccination</label>
+
+        <input type="radio" id="baby_checkup" name="appointment" value="Baby Checkup" required>
+        <label for="baby_checkup">Baby Checkup</label>
+
+        <label for="healthcare">Healthcare Provider:</label>
+        <input type="text" name="healthcare" id="healthcare" placeholder="Insert your healthcare provider" required>
+
+        <label for="date">Date:</label>
+        <input type="date" name="date" id="date" required>
+
+        <label for="time">Time:</label>
+        <input type="time" name="time" id="time" required>
+
+        <button type="submit">Proceed</button>
+        <button type="reset" style="background-color: #ff0000;">Cancel</button>
+    </form>
 </div>
 
-<script>
-  // Listen for form submission
-  document.getElementById('appointmentForm').addEventListener('submit', function(event) {
-      event.preventDefault();  // Prevent form submission (page reload)
-      
-      // Get values from the input fields
-      const child = document.getElementById('child').value;
-      
-      // Check which radio button is selected
-      let appointmentType = '';
-      if (document.getElementById('vaccination').checked) {
-          appointmentType = 'Vaccination';
-      } else if (document.getElementById('baby_checkup').checked) {
-          appointmentType = 'Baby Checkup';
-      }
-      
-      const healthcareProvider = document.getElementById('healthcare').value;
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
-
-      // Store values in localStorage
-      localStorage.setItem('child', child);
-      localStorage.setItem('appointmentType', appointmentType);
-      localStorage.setItem('healthcare', healthcareProvider);
-      localStorage.setItem('date', date);
-      localStorage.setItem('time', time);
-
-      // Redirect to editdelete.html
-      window.location.href = 'editdelete.html';
-  });
-</script>
-
-<style>
-  .centered-text {
-      text-align: center;
-  }
-  * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-  }
-  body {
-      background-image: url('background.jpg');
-      background-repeat: no-repeat;
-      background-position: center center;
-      background-attachment: fixed;
-      font-family: Arial, sans-serif;
-  }
-  .formbold-mb-5 {
-      margin-bottom: 20px;
-  }
-  .formbold-pt-3 {
-      padding-top: 12px;
-  }
-  .formbold-main-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 48px;
-  }
-  .formbold-form-wrapper {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 100%;
-      max-width: 600px;
-      text-align: left;
-  }
-  .formbold-form-label {
-      display: block;
-      font-weight: 500;
-      font-size: 16px;
-      color: #07074d;
-      margin-bottom: 12px;
-  }
-  .formbold-form-label-2 {
-      font-weight: 600;
-      font-size: 20px;
-      margin-bottom: 20px;
-  }
-  .formbold-form-input {
-      width: 100%;
-      padding: 12px 24px;
-      border-radius: 6px;
-      border: 1px solid #e0e0e0;
-      background: white;
-      font-weight: 500;
-      font-size: 16px;
-      color: #6b7280;
-      outline: none;
-      resize: none;
-  }
-  .formbold-form-input:focus {
-      border-color: #6a64f1;
-      box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
-  }
-  .formbold-btn {
-      text-align: center;
-      font-size: 16px;
-      border-radius: 6px;
-      padding: 14px 32px;
-      border: none;
-      font-weight: 600;
-      background-color: #6a64f1;
-      color: white;
-      width: 100%;
-      cursor: pointer;
-  }
-  .formbold-btn2 {
-      text-align: center;
-      font-size: 16px;
-      border-radius: 6px;
-      padding: 14px 32px;
-      border: none;
-      font-weight: 600;
-      background-color: #ff0000;
-      color: white;
-      width: 100%;
-      cursor: pointer;
-  }
-  .formbold-btn:hover {
-      box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.05);
-  }
-  .formbold--mx-3 {
-      margin-left: -12px;
-      margin-right: -12px;
-  }
-  .formbold-px-3 {
-      padding-left: 12px;
-      padding-right: 12px;
-  }
-  .flex {
-      display: flex;
-  }
-  .flex-wrap {
-      flex-wrap: wrap;
-  }
-  .w-full {
-      width: 100%;
-  }
-  @media (min-width: 540px) {
-      .sm\:w-half {
-          width: 50%;
-      }
-  }
-</style>
+</body>
+</html>
