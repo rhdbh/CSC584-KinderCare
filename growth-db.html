@@ -35,32 +35,25 @@
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(app);
 
-        // Fetching data from the "growth" collection
-        async function getGrowthData() {
-            const growthDataRef = db.collection("growth");
-            const growthSnapshot = await growthDataRef.get();
-            const growthData = [];
-
-            growthSnapshot.forEach(doc => {
-                growthData.push(doc.data());  // Push data to the array
-            });
-
-            return growthData; // Return the fetched data
-        }
-
         // Create the Chart
-        async function createChart() {
-            const growthData = await getGrowthData();  // Fetch data from Firestore
+        let growthChart;  // Global variable to store the chart instance
+
+        // Function to create and update the chart
+        function createChart(growthData) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
 
             // Extracting data for chart
             const ages = growthData.map(data => data.age);
             const heights = growthData.map(data => data.height);
             const weights = growthData.map(data => data.weight);
 
-            // Create the chart
-            const ctx = document.getElementById('growthChart').getContext('2d');
+            // Check if the chart already exists, and destroy it before creating a new one
+            if (growthChart) {
+                growthChart.destroy();
+            }
 
-            const growthChart = new Chart(ctx, {
+            // Create or update the chart
+            growthChart = new Chart(ctx, {
                 type: 'line',  // Line chart to show growth trends
                 data: {
                     labels: ages,  // X-axis: Ages of the child
@@ -99,8 +92,22 @@
             });
         }
 
-        // Initialize the chart
-        createChart();
+        // Set up Firestore real-time listener
+        function listenForGrowthData() {
+            db.collection("growth").orderBy("age").onSnapshot((snapshot) => {
+                const growthData = [];
+
+                snapshot.forEach(doc => {
+                    growthData.push(doc.data());  // Push document data to array
+                });
+
+                // Create or update the chart with the fetched data
+                createChart(growthData);
+            });
+        }
+
+        // Initialize the real-time listener
+        listenForGrowthData();
     </script>
 </body>
 </html>
