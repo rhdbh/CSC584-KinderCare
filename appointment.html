@@ -5,6 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment List | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+        }
+
+        .button-secondary {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+        }
+
+        .button-secondary:hover {
+            background-color: #e03e2f;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -26,7 +78,6 @@
         </table>
         <button onclick="window.location.href='add-appointment.html'" class="button">Add Appointment</button>
         <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
-        
     </div>
 
     <script type="module">
