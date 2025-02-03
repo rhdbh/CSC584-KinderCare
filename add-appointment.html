@@ -267,16 +267,16 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function populateChildrenDropdown() {
-            const childrenSnapshot = await getDocs(collection(db, "children"));
-            const childSelect = document.getElementById("ChildName");
+        async function loadChildren() {
+            const childrenDropdown = document.getElementById("childSelect");
 
-            childrenSnapshot.forEach((childDoc) => {
-                const childData = childDoc.data();
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenSnapshot.forEach((docSnap) => {
+                const childData = docSnap.data();
                 const option = document.createElement("option");
-                option.value = childDoc.id;
+                option.value = docSnap.id;
                 option.textContent = childData.ChildName;
-                childSelect.appendChild(option);
+                childrenDropdown.appendChild(option);
             });
         }
 
