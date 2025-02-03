@@ -215,10 +215,11 @@
         <h1>Add Appointment</h1>
 
         <form id="addAppointmentForm">
-            <label for="ChildName">Child Name</label>
-            <select id="ChildName" name="ChildName" required>
-                <option value="" disabled selected>Select Child</option>
-            </select><br>
+            <label for="childSelect">Select Child:</label>
+            <select id="childSelect" required>
+                <option value="">-- Select Child --</option>
+            </select>
+            <br><br>
 
             <label for="AppointmentType">Appointment Type</label>
             <select id="AppointmentType" name="AppointmentType" required>
