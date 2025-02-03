@@ -23,12 +23,19 @@
         const db = getFirestore(app);
 
         let allGrowthRecords = [];
+        let childrenList = [];
 
         async function loadChildren() {
             const childSelect = document.getElementById("childSelect");
             const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenList = [];
+
             childrenSnapshot.forEach((childDoc) => {
                 const childData = childDoc.data();
+                childrenList.push({
+                    id: childDoc.id,
+                    name: childData.ChildName
+                });
                 const option = document.createElement("option");
                 option.value = childDoc.id;
                 option.textContent = childData.ChildName;
@@ -36,15 +43,11 @@
             });
         }
 
-        async function loadGrowthRecords(childId = null) {
+        async function loadGrowthRecords(childName = "") {
             const growthTable = document.getElementById("growthTable");
             growthTable.innerHTML = "";
 
-            const growthQuery = childId
-                ? query(collection(db, "growth"), where("childId", "==", childId))
-                : collection(db, "growth");
-
-            const growthSnapshot = await getDocs(growthQuery);
+            const growthSnapshot = await getDocs(collection(db, "growth"));
             const childrenMap = {};
 
             const childrenSnapshot = await getDocs(collection(db, "children"));
@@ -56,11 +59,15 @@
                 const growth = docSnap.data();
                 const growthId = docSnap.id;
                 const childData = childrenMap[growth.childId] || { ChildName: "Unknown" };
-                const childName = childData.ChildName;
+                const childNameFromGrowth = childData.ChildName;
+
+                if (childName && childName !== childNameFromGrowth) {
+                    return;
+                }
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${childName}</td>
+                    <td>${childNameFromGrowth}</td>
                     <td>${growth.age} month(s)</td>
                     <td>${growth.height} cm</td>
                     <td>${growth.weight} kg</td>
@@ -92,13 +99,13 @@
         }
 
         function filterGrowthRecords() {
-            const childId = document.getElementById("childSelect").value;
-            loadGrowthRecords(childId);
+            const childName = document.getElementById("childSelect").value;
+            loadGrowthRecords(childName);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
             loadChildren();
-            loadGrowthRecords(); 
+            loadGrowthRecords();
         });
 
         window.deleteGrowth = deleteGrowth;
@@ -108,8 +115,7 @@
 <body>
     <div class="container">
         <h1>Growth Records</h1>
-
-        <!-- Dropdown to filter by child -->
+        
         <label for="childSelect">Select Child:</label>
         <select id="childSelect" onchange="filterGrowthRecords()">
             <option value="">-- All Children --</option>
