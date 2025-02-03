@@ -9,25 +9,23 @@
 </head>
 <body>
     <div class="container">
-        <h1>My Beloved Children</h1>
-        <table>
+        <a href="dashboard.html" class="back-button">← Back to Dashboard</a>
+        <h1>My Children</h1>
+        <table class="table">
             <thead>
                 <tr>
                     <th>Child Name</th>
                     <th>Date of Birth</th>
                     <th>Age</th>
                     <th>Gender</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="childrenTable">
-                <tr>
-                    <td colspan="4">Loading...</td>
-                </tr>
             </tbody>
         </table>
         <br>
-        <button class="button" onclick="window.location.href='add-children.html'">Add New Children</button>
-        <button class="button" onclick="window.location.href='dashboard.html'">Back to Dashboard</button>
+        <button class="button" onclick="window.location.href='add-children.html'">+ Add New Children</button>
     </div>
 
     <script type="module" src="js/children.js"></script>
