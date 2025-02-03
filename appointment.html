@@ -1,47 +1,30 @@
-<?php
-// Database connection
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "kindercare";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Handle form submission
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $child = $_POST['child'];
-    $appointmentType = $_POST['appointment'];
-    $healthcareProvider = $_POST['healthcare'];
-    $date = $_POST['date'];
-    $time = $_POST['time'];
-
-    // Use Prepared Statements to prevent SQL injection
-    $stmt = $conn->prepare("INSERT INTO appointments (child_id, appointment_type, healthcare_provider, date, time) VALUES (?, ?, ?, ?, ?)");
-    $stmt->bind_param("sssss", $child, $appointmentType, $healthcareProvider, $date, $time);
-
-    if ($stmt->execute()) {
-        echo "<script>alert('Appointment booked successfully!'); window.location.href='editdelete.html';</script>";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-
-    $stmt->close();
-}
-
-$conn->close();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment | KinderCare</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
+
+    <script>
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -83,43 +66,109 @@ $conn->close();
         button:hover {
             background-color: #5753d9;
         }
+        .appointment-list {
+            margin-top: 30px;
+        }
+        .appointment-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .appointment-list li {
+            background-color: #fff;
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Book Appointment | KinderCare</h1>
-    <p>Please fill in the details below to book an appointment.</p>
+    <!-- Appointment Form -->
+    <div class="container">
+        <h1>Book Appointment | KinderCare</h1>
+        <p>Please fill in the details below to book an appointment.</p>
 
-    <form action="" method="POST">
-        <label for="child">Children ID Number:</label>
-        <select id="child" name="child" required>                       
-            <option value="">Select children ID number</option>
-            <option value="123">Child 123</option>
-            <option value="124">Child 124</option>
-            <option value="125">Child 125</option>
-        </select>
+        <form id="appointmentForm">
+            <label for="child">Children ID Number:</label>
+            <select id="child" name="child" required>
+                <option value="">Select children ID number</option>
+                <option value="123">Child 123</option>
+                <option value="124">Child 124</option>
+                <option value="125">Child 125</option>
+            </select>
 
-        <label>Choose Appointment:</label>
-        <input type="radio" id="vaccination" name="appointment" value="Vaccination" required>
-        <label for="vaccination">Vaccination</label>
+            <label>Choose Appointment:</label>
+            <input type="radio" id="vaccination" name="appointment" value="Vaccination" required>
+            <label for="vaccination">Vaccination</label>
+            <input type="radio" id="baby_checkup" name="appointment" value="Baby Checkup" required>
+            <label for="baby_checkup">Baby Checkup</label>
 
-        <input type="radio" id="baby_checkup" name="appointment" value="Baby Checkup" required>
-        <label for="baby_checkup">Baby Checkup</label>
+            <label for="healthcare">Healthcare Provider:</label>
+            <input type="text" name="healthcare" id="healthcare" placeholder="Insert your healthcare provider" required>
 
-        <label for="healthcare">Healthcare Provider:</label>
-        <input type="text" name="healthcare" id="healthcare" placeholder="Insert your healthcare provider" required>
+            <label for="date">Date:</label>
+            <input type="date" name="date" id="date" required>
 
-        <label for="date">Date:</label>
-        <input type="date" name="date" id="date" required>
+            <label for="time">Time:</label>
+            <input type="time" name="time" id="time" required>
 
-        <label for="time">Time:</label>
-        <input type="time" name="time" id="time" required>
+            <button type="submit">Submit Appointment</button>
+        </form>
+    </div>
 
-        <button type="submit">Proceed</button>
-        <button type="reset" style="background-color: #ff0000;">Cancel</button>
-    </form>
-</div>
+    <!-- Appointment List -->
+    <div class="appointment-list">
+        <h2>Booked Appointments</h2>
+        <ul id="appointmentList"></ul>
+    </div>
+
+    <script>
+        // Handle form submission
+        document.getElementById('appointmentForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent form from submitting normally
+
+            // Get values from form
+            const child = document.getElementById('child').value;
+            const appointmentType = document.querySelector('input[name="appointment"]:checked').value;
+            const healthcareProvider = document.getElementById('healthcare').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            // Save data to Firestore
+            db.collection("appointments").add({
+                child_id: child,
+                appointment_type: appointmentType,
+                healthcare_provider: healthcareProvider,
+                date: date,
+                time: time
+            }).then(() => {
+                alert('Appointment booked successfully!');
+                document.getElementById('appointmentForm').reset(); // Clear form
+                loadAppointments(); // Reload appointments
+            }).catch((error) => {
+                console.error("Error booking appointment: ", error);
+                alert('Failed to book appointment');
+            });
+        });
+
+        // Function to load and display appointments
+        function loadAppointments() {
+            db.collection("appointments").get().then((querySnapshot) => {
+                const appointmentList = document.getElementById('appointmentList');
+                appointmentList.innerHTML = ''; // Clear existing list
+                querySnapshot.forEach((doc) => {
+                    const appointment = doc.data();
+                    const li = document.createElement('li');
+                    li.textContent = `Child ID: ${appointment.child_id}, Appointment: ${appointment.appointment_type}, Healthcare Provider: ${appointment.healthcare_provider}, Date: ${appointment.date}, Time: ${appointment.time}`;
+                    appointmentList.appendChild(li);
+                });
+            });
+        }
+
+        // Load appointments on page load
+        window.onload = loadAppointments;
+    </script>
 
 </body>
 </html>
