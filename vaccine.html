@@ -9,15 +9,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch children data
-$sql = "SELECT ChildID, ChildName FROM child";
+// Fetch vaccine log with child names
+$sql = "SELECT v.VaccineID, c.ChildName, v.VaccineType, v.Date, v.Status 
+        FROM vaccine v 
+        JOIN child c ON v.ChildID = c.ChildID";
 $result = $conn->query($sql);
-$children = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $children[] = $row;
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -30,37 +26,43 @@ if ($result->num_rows > 0) {
 </head>
 <body>
     <div class="container">
-        <h1>Add Vaccine Log</h1>
-        <form action="add_vaccine_log.php" method="POST">
-            <div class="form-group">
-                <label for="childID">Select Child</label>
-                <select id="childID" name="childID" required>
-                    <option value="">Select your child</option>
-                    <?php foreach ($children as $child): ?>
-                        <option value="<?= $child['ChildID']; ?>"><?= $child['ChildName']; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date" required>
-            </div>
-
-            <div class="form-group">
-                <label for="vaccineType">Vaccine Type</label>
-                <input type="text" id="vaccineType" name="vaccineType" placeholder="Enter Vaccine Type" required>
-            </div>
-
-            <div class="form-group">
-                <label for="status">Status</label>
-                <input type="text" id="status" name="status" placeholder="Enter Status (e.g., Completed, Pending)" required>
-            </div>
-
-            <button type="submit" class="button">Add Vaccine Log</button>
-        </form>
-
-        <a href="dashboard.php" class="back-button">Back to Dashboard</a>
+        <h1>Vaccine Log</h1>
+        <table border="1" width="100%">
+            <thead>
+                <tr>
+                    <th>Child Name</th>
+                    <th>Vaccine Type</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if ($result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($row['ChildName']); ?></td>
+                            <td><?= htmlspecialchars($row['VaccineType']); ?></td>
+                            <td><?= htmlspecialchars($row['Date']); ?></td>
+                            <td><?= htmlspecialchars($row['Status']); ?></td>
+                            <td>
+                                <a href="edit_vaccine_log.php?id=<?= $row['VaccineID']; ?>">Edit</a> |
+                                <a href="delete_vaccine_log.php?id=<?= $row['VaccineID']; ?>" onclick="return confirm('Are you sure?');">Delete</a>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No vaccine records found.</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+        <br>
+        <a href="add_vaccine_log.php">Add Vaccine Log</a> | 
+        <a href="dashboard.php">Back to Dashboard</a>
     </div>
 </body>
 </html>
+
+<?php $conn->close(); ?>
