@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Vaccine | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Vaccine Record</h1>
+
+        <form id="addVaccineForm">
+            <label for="ChildName">Child Name</label>
+            <select id="ChildName" name="ChildName" required>
+                <option value="" disabled selected>Select Child</option>
+            </select>
+
+            <label for="Status">Status</label>
+            <select id="Status" name="Status" required>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+
+            <label for="VaccineDate">Vaccine Date</label>
+            <input type="date" id="VaccineDate" name="VaccineDate" required>
+
+            <label for="VaccineType">Vaccine Type</label>
+            <input type="text" id="VaccineType" name="VaccineType" required>
+
+            <button type="submit" class="button">Add Vaccine Record</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='vaccine.html'">← Back to Vaccine Records</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        async function loadChildren() {
+            const childSelect = document.getElementById("ChildName");
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+
+            childrenSnapshot.forEach((docSnap) => {
+                const childData = docSnap.data();
+                const option = document.createElement("option");
+                option.value = docSnap.id; // childId as value
+                option.textContent = childData.ChildName || "Unknown";
+                childSelect.appendChild(option);
+            });
+        }
+
+        loadChildren();
+        const addVaccineForm = document.getElementById('addVaccineForm');
+        addVaccineForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const childName = document.getElementById("ChildName").value;
+            const status = document.getElementById("Status").value;
+            const vaccineDate = document.getElementById("VaccineDate").value;
+            const vaccineType = document.getElementById("VaccineType").value;
+
+            try {
+                await addDoc(collection(db, "vaccine"), {
+                    childId: childName,
+                    status: status,
+                    vaccineDate: vaccineDate,
+                    vaccineType: vaccineType,
+                });
+
+                alert("Vaccine record added successfully!");
+                window.location.href = "vaccine.html";
+            } catch (error) {
+                console.error("Error adding vaccine record:", error);
+            }
+        });
+    </script>
+</body>
+</html>
