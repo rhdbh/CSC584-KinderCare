@@ -9,24 +9,45 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
-   // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+    <script type="module">
+        // Import the necessary Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
-  authDomain: "kindercare-cd7da.firebaseapp.com",
-  databaseURL: "https://kindercare-cd7da-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "kindercare-cd7da",
-  storageBucket: "kindercare-cd7da.firebasestorage.app",
-  messagingSenderId: "930908122510",
-  appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
-};
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            databaseURL: "https://kindercare-cd7da-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+        // Initialize Firebase and Firestore
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app); // Firestore instance
+
+        // Function to load children from Firestore and populate the select dropdown
+        async function loadChildren() {
+            const childrenRef = collection(db, "children");  // Reference to children collection
+            const querySnapshot = await getDocs(childrenRef); // Fetch data from Firestore
+            const childSelect = document.getElementById('child'); // Get the select element
+            childSelect.innerHTML = '<option value="">Select children ID number</option>'; // Clear previous options
+
+            querySnapshot.forEach((doc) => {
+                const child = doc.data();
+                const option = document.createElement('option');
+                option.value = child.child_id; // Use child_id from Firestore
+                option.textContent = `Child ${child.child_id}`; // Display child ID
+                childSelect.appendChild(option); // Add the option to the select dropdown
+            });
+        }
+
+        // Load children when the page loads
+        window.onload = loadChildren;
+    </script>
 
     <style>
         body {
@@ -69,20 +90,6 @@ const app = initializeApp(firebaseConfig);
         button:hover {
             background-color: #5753d9;
         }
-        .appointment-list {
-            margin-top: 30px;
-        }
-        .appointment-list ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .appointment-list li {
-            background-color: #fff;
-            margin: 5px;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
     </style>
 </head>
 <body>
@@ -96,9 +103,7 @@ const app = initializeApp(firebaseConfig);
             <label for="child">Children ID Number:</label>
             <select id="child" name="child" required>
                 <option value="">Select children ID number</option>
-                <option value="123">Child 123</option>
-                <option value="124">Child 124</option>
-                <option value="125">Child 125</option>
+                <!-- Children options will be dynamically populated here -->
             </select>
 
             <label>Choose Appointment:</label>
@@ -119,59 +124,6 @@ const app = initializeApp(firebaseConfig);
             <button type="submit">Submit Appointment</button>
         </form>
     </div>
-
-    <!-- Appointment List -->
-    <div class="appointment-list">
-        <h2>Booked Appointments</h2>
-        <ul id="appointmentList"></ul>
-    </div>
-
-    <script>
-        // Handle form submission
-        document.getElementById('appointmentForm').addEventListener('submit', function (e) {
-            e.preventDefault(); // Prevent form from submitting normally
-
-            // Get values from form
-            const child = document.getElementById('child').value;
-            const appointmentType = document.querySelector('input[name="appointment"]:checked').value;
-            const healthcareProvider = document.getElementById('healthcare').value;
-            const date = document.getElementById('date').value;
-            const time = document.getElementById('time').value;
-
-            // Save data to Firestore
-            db.collection("appointments").add({
-                child_id: child,
-                appointment_type: appointmentType,
-                healthcare_provider: healthcareProvider,
-                date: date,
-                time: time
-            }).then(() => {
-                alert('Appointment booked successfully!');
-                document.getElementById('appointmentForm').reset(); // Clear form
-                loadAppointments(); // Reload appointments
-            }).catch((error) => {
-                console.error("Error booking appointment: ", error);
-                alert('Failed to book appointment');
-            });
-        });
-
-        // Function to load and display appointments
-        function loadAppointments() {
-            db.collection("appointments").get().then((querySnapshot) => {
-                const appointmentList = document.getElementById('appointmentList');
-                appointmentList.innerHTML = ''; // Clear existing list
-                querySnapshot.forEach((doc) => {
-                    const appointment = doc.data();
-                    const li = document.createElement('li');
-                    li.textContent = `Child ID: ${appointment.child_id}, Appointment: ${appointment.appointment_type}, Healthcare Provider: ${appointment.healthcare_provider}, Date: ${appointment.date}, Time: ${appointment.time}`;
-                    appointmentList.appendChild(li);
-                });
-            });
-        }
-
-        // Load appointments on page load
-        window.onload = loadAppointments;
-    </script>
 
 </body>
 </html>
