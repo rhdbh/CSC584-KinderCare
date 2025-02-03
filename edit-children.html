@@ -5,95 +5,82 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Child | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <a href="children.html" class="button button-secondary">← Back to Children</a>
+        <h1>Edit Child</h1>
+
+        <form id="editChildForm">
+            <label for="childName">Child Name</label>
+            <input type="text" id="childName" name="childName" required>
+
+            <label for="DateOfBirth">Date of Birth</label>
+            <input type="date" id="DateOfBirth" name="DateOfBirth" required>
+
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+
+            <button type="submit" class="button">Save Changes</button>
+        </form>
+    </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
-  authDomain: "kindercare-cd7da.firebaseapp.com",
-  projectId: "kindercare-cd7da",
-  storageBucket: "kindercare-cd7da.firebasestorage.app",
-  messagingSenderId: "930908122510",
-  appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
-};
+    const firebaseConfig = {
+          apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+          authDomain: "kindercare-cd7da.firebaseapp.com",
+          projectId: "kindercare-cd7da",
+          storageBucket: "kindercare-cd7da.firebasestorage.app",
+          messagingSenderId: "930908122510",
+          appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+    };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const urlParams = new URLSearchParams(window.location.search);
-        const childId = urlParams.get("id");
+        const childId = urlParams.get('id');
 
-        async function fetchChildData() {
-            if (!childId) {
-                alert("Invalid child ID!");
-                window.location.href = "children.html";
-                return;
-            }
+        const childDocRef = doc(db, "children", childId);
+        const docSnap = await getDoc(childDocRef);
 
-            try {
-                const childRef = doc(db, "children", childId);
-                const childSnap = await getDoc(childRef);
+        if (docSnap.exists()) {
+            const childData = docSnap.data();
 
-                if (!childSnap.exists()) {
-                    alert("Child not found!");
-                    window.location.href = "children.html";
-                    return;
-                }
-
-                const child = childSnap.data();
-                document.getElementById("childName").value = child.ChildName;
-                document.getElementById("dob").value = child.DateOfBirth;
-                document.getElementById("gender").value = child.Gender;
-            } catch (error) {
-                console.error("Error fetching child data:", error);
-            }
+            document.getElementById("childName").value = childData.childName;
+            document.getElementById("DateOfBirth").value = childData.DateOfBirth;
+            document.getElementById("gender").value = childData.gender;
+        } else {
+            console.log("No such document!");
         }
 
-        async function updateChildData(event) {
-            event.preventDefault();
+        const editChildForm = document.getElementById('editChildForm');
+        editChildForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-            const updatedChild = {
-                ChildName: document.getElementById("childName").value,
-                DateOfBirth: document.getElementById("dob").value,
-                Gender: document.getElementById("gender").value
-            };
+            const updatedChildName = document.getElementById("childName").value;
+            const updatedDateOfBirth = document.getElementById("DateOfBirth").value;
+            const updatedGender = document.getElementById("gender").value;
 
             try {
-                const childRef = doc(db, "children", childId);
-                await updateDoc(childRef, updatedChild);
-                alert("Child details updated successfully!");
+                await updateDoc(childDocRef, {
+                    childName: updatedChildName,
+                    DateOfBirth: updatedDateOfBirth,
+                    gender: updatedGender,
+                });
+
+                console.log("Child updated successfully!");
                 window.location.href = "children.html";
             } catch (error) {
-                console.error("Error updating child data:", error);
+                console.error("Error updating child: ", error);
             }
-        }
-
-        document.addEventListener("DOMContentLoaded", fetchChildData);
-        window.updateChildData = updateChildData;
+        });
     </script>
-</head>
-<body>
-    <div class="container">
-        <h1>Edit Child</h1>
-        <form id="editChildForm" onsubmit="updateChildData(event)">
-            <label for="childName">Child Name:</label>
-            <input type="text" id="childName" required>
-
-            <label for="dob">Date of Birth:</label>
-            <input type="date" id="dob" required>
-
-            <label for="gender">Gender:</label>
-            <select id="gender" required>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-            </select>
-
-            <br><br>
-            <button type="submit" class="button">💾 Save Changes</button>
-            <button type="button" class="back-button" onclick="window.location.href='children.html'">← Cancel</button>
-        </form>
-    </div>
 </body>
 </html>
