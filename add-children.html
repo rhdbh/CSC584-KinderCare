@@ -1,85 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Children | KinderCare</title>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            text-align: center;
-        }
-        input[type="text"], input[type="date"], select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box;
-            margin: 0 auto;
-            display: block;
-        }
-        .button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Add Child Details</h1>
-        <p><strong>Logged-in as:</strong> <span id="userName"></span></p>
-        <form id="addChildForm">
-            <div class="form-group">
-                <label for="childName">Child's Name</label>
-                <input type="text" id="childName" name="childName" placeholder="Enter Child's Name" required>
-            </div>
+// Import Firebase modules
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
 
-            <div class="form-group">
-                <label for="dateOfBirth">Date of Birth</label>
-                <input type="date" id="dateOfBirth" name="dateOfBirth" required>
-            </div>
-
-            <div class="form-group">
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender" required>
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-            </div>
-            <button type="submit" class="button">Add Child</button>
-        </form>
-    </div>
-    <script>
+// Firebase configuration (Replace with your Firebase config)
 const firebaseConfig = {
   apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
   authDomain: "kindercare-cd7da.firebaseapp.com",
@@ -89,55 +13,63 @@ const firebaseConfig = {
   appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
 };
 
-        // ✅ Step 2: Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-        let currentUserID = null; // To store logged-in user ID
+// Function to calculate age from Date of Birth
+function calculateAge(dob) {
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
 
-        // ✅ Step 3: Check if User is Logged In
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                currentUserID = user.uid;
-                document.getElementById("userName").innerText = user.email; // Display logged-in user
+// Function to fetch and display children
+const loadChildren = async (userId) => {
+    const childrenTable = document.getElementById("childrenTable");
+    childrenTable.innerHTML = "<tr><td colspan='4'>Loading...</td></tr>";
 
-                console.log("User logged in:", user.email);
-            } else {
-                alert("You must be logged in to add children.");
-                window.location.href = "login.html"; // Redirect to login page if not logged in
-            }
+    try {
+        const childrenQuery = query(collection(db, "children"), where("ParentID", "==", userId));
+        const querySnapshot = await getDocs(childrenQuery);
+
+        if (querySnapshot.empty) {
+            childrenTable.innerHTML = "<tr><td colspan='4'>No child found.</td></tr>";
+            return;
+        }
+
+        let html = "";
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const age = calculateAge(data.DateOfBirth);
+            html += `
+                <tr>
+                    <td>${data.ChildName}</td>
+                    <td>${new Date(data.DateOfBirth).toLocaleDateString()}</td>
+                    <td>${age} years</td>
+                    <td>${data.Gender}</td>
+                </tr>
+            `;
         });
 
-        // ✅ Step 4: Handle Form Submission (Tied to Logged-in User)
-        document.getElementById("addChildForm").addEventListener("submit", async (e) => {
-            e.preventDefault();
+        childrenTable.innerHTML = html;
+    } catch (error) {
+        console.error("Error fetching children:", error);
+        childrenTable.innerHTML = "<tr><td colspan='4'>Error loading data.</td></tr>";
+    }
+};
 
-            const childName = document.getElementById("childName").value;
-            const dateOfBirth = document.getElementById("dateOfBirth").value;
-            const gender = document.getElementById("gender").value;
-
-            if (!childName || !dateOfBirth || !gender) {
-                alert("Please fill in all fields.");
-                return;
-            }
-
-            try {
-                await db.collection("children").add({
-                    userID: currentUserID, // Store with logged-in user ID
-                    childName,
-                    dateOfBirth,
-                    gender,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                alert("Child added successfully!");
-                document.getElementById("addChildForm").reset();
-            } catch (error) {
-                console.error("Error adding child: ", error);
-                alert("Error adding child. Try again.");
-            }
-        });
-    </script>
-</body>
-</html>
+// Listen for authentication state
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        loadChildren(user.uid);
+    } else {
+        window.location.href = "login.html"; // Redirect if not logged in
+    }
+});
