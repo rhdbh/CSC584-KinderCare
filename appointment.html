@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Appointment | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
+
     
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
@@ -94,120 +96,6 @@
         document.getElementById('appointmentForm').addEventListener('submit', handleAppointmentSubmit);
     </script>
 
-    <style>
-        /* Basic Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #6a64f1, #ff6a64);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container {
-            background: #fff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
-        p {
-            color: #777;
-            font-size: 1rem;
-            margin-bottom: 20px;
-        }
-
-        /* Form Elements Styling */
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        label {
-            font-weight: bold;
-            font-size: 1rem;
-            margin-top: 15px;
-            color: #333;
-            text-align: left;
-        }
-
-        select, input[type="text"], input[type="date"], input[type="time"], button {
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            font-size: 1rem;
-            margin-bottom: 15px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        select:focus, input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus {
-            border-color: #6a64f1;
-            box-shadow: 0 0 5px rgba(106, 100, 241, 0.5);
-        }
-
-        button {
-            background-color: #6a64f1;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #5753d9;
-        }
-
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* Radio Button Styling */
-        .appointment-options {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 10px;
-        }
-
-        .appointment-options input {
-            margin-top: 0;
-        }
-
-        .appointment-options label {
-            margin-left: 5px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                width: 90%;
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 1.8rem;
-            }
-        }
-    </style>
 </head>
 <body>
 
