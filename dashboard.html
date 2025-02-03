@@ -65,15 +65,16 @@
 
     </div>
 
-    <!-- JavaScript to display the username dynamically -->
     <script>
-        // Get the username from sessionStorage (assuming it's set during login)
-        const username = sessionStorage.getItem('userName');
-        if (userName) {
-            document.getElementById('userName').textContent = userName;
-        } else {
-            window.location.href = 'login.html'; // Redirect to login if not found
-        }
-    </script>
+    // Retrieve the username from sessionStorage
+    const username = sessionStorage.getItem('userName');
+
+    if (username) {
+        document.getElementById('userName').textContent = username; // Display username
+    } else {
+        window.location.href = 'login.html'; // Redirect to login if username is missing
+    }
+</script>
+
 </body>
 </html>
