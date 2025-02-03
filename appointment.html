@@ -12,7 +12,7 @@
     <script type="module">
         // Import necessary Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -73,7 +73,7 @@
                 return;
             }
 
-            // Save the appointment data (example)
+            // Save the appointment data
             try {
                 const appointmentRef = collection(db, "appointments");
                 await addDoc(appointmentRef, {
@@ -135,6 +135,12 @@
         button:hover {
             background-color: #5753d9;
         }
+        .radio-container {
+            margin-top: 15px;
+        }
+        .radio-container input {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -150,14 +156,14 @@
                 <!-- Children options will be dynamically populated here -->
             </select>
 
-           <div class="formbold-mb-5">
-              <label class="formbold-form-label formbold-form-label-2">Choose Appointment</label>
-              <form id="appointmentForm">
-                  <input type="radio" id="vaccination" name="appointment" value="vaccination">
-                  <label for="vaccination">Vaccination</label>
-                  <input type="radio" id="baby_checkup" name="appointment" value="baby_checkup">
-                  <label for="baby_checkup">Baby Checkup</label><br>
-          </div>
+            <div class="radio-container">
+                <label class="formbold-form-label formbold-form-label-2">Choose Appointment</label>
+                <input type="radio" id="vaccination" name="appointment" value="vaccination">
+                <label for="vaccination">Vaccination</label>
+                <input type="radio" id="baby_checkup" name="appointment" value="baby_checkup">
+                <label for="baby_checkup">Baby Checkup</label>
+            </div>
+
             <label for="healthcare">Healthcare Provider:</label>
             <input type="text" name="healthcare" id="healthcare" placeholder="Insert your healthcare provider" required>
 
