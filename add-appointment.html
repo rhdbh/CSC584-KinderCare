@@ -281,11 +281,11 @@
             });
         }
 
-        const addAppointmentForm = document.getElementById("addAppointmentForm");
+         const addAppointmentForm = document.getElementById("addAppointmentForm");
         addAppointmentForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const selectedChildId = document.getElementById("ChildName").value;
+            const selectedChildId = document.getElementById("childSelect").value; // Updated line
             const selectedChildSnapshot = await getDoc(doc(db, "children", selectedChildId));
             const selectedChildName = selectedChildSnapshot.data().ChildName;
 
