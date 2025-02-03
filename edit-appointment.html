@@ -12,15 +12,15 @@
         
         <form id="editAppointmentForm">
             <label for="childSelect">Select Child:</label>
-            <select id="childSelect" required>
+            <select id="childSelect" disabled required>
                 <option value="">-- Select Child --</option>
             </select>
             <br><br>
 
             <label for="AppointmentType">Appointment Type</label>
             <select id="AppointmentType" name="AppointmentType" required>
-                <option value="vaccine">Vaccination</option>
-                <option value="checkup">Check Up</option>
+                <option value="Vaccination">Vaccination</option>
+                <option value="Check Up">Check Up</option>
             </select><br>
 
             <label for="HealthcareProvider">Healthcare Provider</label>
@@ -72,7 +72,6 @@
             if (appointmentDoc.exists()) {
                 const appointmentData = appointmentDoc.data();
 
-                document.getElementById("childSelect").value = appointmentData.childId;
                 document.getElementById("AppointmentType").value = appointmentData.appointmentType;
                 document.getElementById("HealthcareProvider").value = appointmentData.healthcareProvider;
                 document.getElementById("AppointmentDate").value = appointmentData.appointmentDate.toDate().toISOString().split('T')[0];
@@ -80,14 +79,14 @@
                 document.getElementById("Status").value = appointmentData.status;
                 document.getElementById("Remark").value = appointmentData.remark;
 
-                loadChildren();
+                loadChildren(appointmentData.childId);
             } else {
                 alert("Appointment not found.");
                 window.location.href = "appointment.html";
             }
         }
 
-        async function loadChildren() {
+        async function loadChildren(selectedChildId) {
             const childrenDropdown = document.getElementById("childSelect");
 
             const childrenSnapshot = await getDocs(collection(db, "children"));
@@ -96,15 +95,21 @@
                 const option = document.createElement("option");
                 option.value = docSnap.id;
                 option.textContent = childData.ChildName;
+
+                if (docSnap.id === selectedChildId) {
+                    option.selected = true;
+                }
+
                 childrenDropdown.appendChild(option);
             });
+
+            childrenDropdown.disabled = true;
         }
 
         document.getElementById("editAppointmentForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
             const updatedAppointment = {
-                childId: document.getElementById("childSelect").value,
                 appointmentType: document.getElementById("AppointmentType").value,
                 healthcareProvider: document.getElementById("HealthcareProvider").value,
                 appointmentDate: new Date(document.getElementById("AppointmentDate").value),
