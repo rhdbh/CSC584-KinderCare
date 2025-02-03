@@ -9,7 +9,7 @@
 <head>
     <style>
         .card {
-            width: 150px; /* Adjust the width of each card */
+            width: 150px;
             text-align: center;
             background: white;
             padding: 10px;
@@ -17,24 +17,21 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .card-img {
-            width: 80px; /* Adjust the width of the image */
-            height: auto; /* Maintain aspect ratio */
+            width: 80px;
+            height: auto;
             display: block;
-            margin: 0 auto; /* Center the image */
+            margin: 0 auto;
         }
     </style>
 </head>
 
 <body>
-    <!-- Logout button -->
     <button class="logout-button" onclick="window.location.href='logout.html'">Logout</button>
-    
-    <!-- Main container -->
+
     <div class="container">
         <h1>Welcome to KinderCare!</h1>
         <h3>Please select menu to proceed.</h3>
         
-        <!-- Dashboard content -->
 <div class="card-container">
     <div class="card">
         <a href="children.html">
@@ -58,14 +55,13 @@
     </div>
 </div>
 <script>
-        // Get the username from sessionStorage (assuming it's set during login)
         const username = sessionStorage.getItem('username');
         if (username) {
             document.getElementById('userName').textContent = username;
         if (username) {
             document.getElementById('userName').textContent = username;
         } else {
-            window.location.href = 'login.html'; // Redirect to login if not found
+            window.location.href = 'login.html';
         }
     </script>
 </body>
