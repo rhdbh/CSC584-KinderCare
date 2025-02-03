@@ -32,7 +32,7 @@
     
     <!-- Main container -->
     <div class="container">
-        <h1>Welcome to KinderCare, <span id="userName"></span>!</h1> <!-- Display the username -->
+        <h1>Welcome to KinderCare</h1>
 
         <!-- Dashboard content -->
 <div class="card-container">
@@ -64,17 +64,5 @@
 </div>
 
     </div>
-
-    <script>
-    // Retrieve the username from sessionStorage
-    const username = sessionStorage.getItem('userName');
-
-    if (username) {
-        document.getElementById('userName').textContent = username; // Display username
-    } else {
-        window.location.href = 'login.html'; // Redirect to login if username is missing
-    }
-</script>
-
 </body>
 </html>
