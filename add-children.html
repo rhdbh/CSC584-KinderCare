@@ -56,6 +56,7 @@
 <body>
     <div class="container">
         <h1>Add Child Details</h1>
+        <p><strong>Logged-in as:</strong> <span id="userName"></span></p>
         <form id="addChildForm">
             <div class="form-group">
                 <label for="childName">Child's Name</label>
@@ -78,7 +79,6 @@
             <button type="submit" class="button">Add Child</button>
         </form>
     </div>
-
     <script>
 const firebaseConfig = {
   apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
@@ -92,39 +92,39 @@ const firebaseConfig = {
         // ✅ Step 2: Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        // ✅ Step 3: Populate User Dropdown (Fetching from Firestore)
-        async function loadUsers() {
-            const userSelect = document.getElementById("userID");
-            const usersRef = db.collection("users");
-            const snapshot = await usersRef.get();
+        let currentUserID = null; // To store logged-in user ID
 
-            snapshot.forEach(doc => {
-                let option = document.createElement("option");
-                option.value = doc.id;
-                option.textContent = doc.data().UserName;
-                userSelect.appendChild(option);
-            });
-        }
-        loadUsers(); // Call function to load users into dropdown
+        // ✅ Step 3: Check if User is Logged In
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUserID = user.uid;
+                document.getElementById("userName").innerText = user.email; // Display logged-in user
 
-        // ✅ Step 4: Handle Form Submission
+                console.log("User logged in:", user.email);
+            } else {
+                alert("You must be logged in to add children.");
+                window.location.href = "login.html"; // Redirect to login page if not logged in
+            }
+        });
+
+        // ✅ Step 4: Handle Form Submission (Tied to Logged-in User)
         document.getElementById("addChildForm").addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const userID = document.getElementById("userID").value;
             const childName = document.getElementById("childName").value;
             const dateOfBirth = document.getElementById("dateOfBirth").value;
             const gender = document.getElementById("gender").value;
 
-            if (!userID || !childName || !dateOfBirth || !gender) {
+            if (!childName || !dateOfBirth || !gender) {
                 alert("Please fill in all fields.");
                 return;
             }
 
             try {
                 await db.collection("children").add({
-                    userID,
+                    userID: currentUserID, // Store with logged-in user ID
                     childName,
                     dateOfBirth,
                     gender,
@@ -140,3 +140,4 @@ const firebaseConfig = {
         });
     </script>
 </body>
+</html>
