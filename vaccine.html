@@ -85,7 +85,7 @@
         async function completeVaccine(vaccineId) {
             try {
                 await updateDoc(doc(db, "vaccine", vaccineId), {
-                    status: "completed"
+                    status: "Completed"
                 });
                 loadVaccineRecords();
             } catch (error) {
