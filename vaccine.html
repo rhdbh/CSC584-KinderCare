@@ -51,7 +51,6 @@
             const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
             const childrenMap = {};
 
-            // Fetch all children to match with vaccine records
             const childrenSnapshot = await getDocs(collection(db, "children"));
             childrenSnapshot.forEach((childDoc) => {
                 childrenMap[childDoc.id] = childDoc.data();
@@ -98,7 +97,7 @@
                 await updateDoc(vaccineRef, {
                     status: "completed"
                 });
-                // Update the status in the table after the Firestore update
+ 
                 document.getElementById(`status-${vaccineId}`).innerText = "completed";
             } catch (error) {
                 console.error("Error updating vaccine status:", error);
