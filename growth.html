@@ -8,7 +8,7 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
@@ -22,11 +22,29 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function loadGrowthRecords() {
+        let allGrowthRecords = [];
+
+        async function loadChildren() {
+            const childSelect = document.getElementById("childSelect");
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenSnapshot.forEach((childDoc) => {
+                const childData = childDoc.data();
+                const option = document.createElement("option");
+                option.value = childDoc.id;
+                option.textContent = childData.ChildName;
+                childSelect.appendChild(option);
+            });
+        }
+
+        async function loadGrowthRecords(childId = null) {
             const growthTable = document.getElementById("growthTable");
             growthTable.innerHTML = "";
 
-            const growthSnapshot = await getDocs(collection(db, "growth"));
+            const growthQuery = childId
+                ? query(collection(db, "growth"), where("childId", "==", childId))
+                : collection(db, "growth");
+
+            const growthSnapshot = await getDocs(growthQuery);
             const childrenMap = {};
 
             const childrenSnapshot = await getDocs(collection(db, "children"));
@@ -52,6 +70,7 @@
                     </td>
                 `;
                 growthTable.appendChild(row);
+                allGrowthRecords.push(growth);
             });
         }
 
@@ -72,7 +91,16 @@
             window.location.href = `edit-growth.html?id=${growthId}`;
         }
 
-        document.addEventListener("DOMContentLoaded", loadGrowthRecords);
+        function filterGrowthRecords() {
+            const childId = document.getElementById("childSelect").value;
+            loadGrowthRecords(childId);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadChildren();
+            loadGrowthRecords(); 
+        });
+
         window.deleteGrowth = deleteGrowth;
         window.editGrowth = editGrowth;
     </script>
@@ -80,6 +108,14 @@
 <body>
     <div class="container">
         <h1>Growth Records</h1>
+
+        <!-- Dropdown to filter by child -->
+        <label for="childSelect">Select Child:</label>
+        <select id="childSelect" onchange="filterGrowthRecords()">
+            <option value="">-- All Children --</option>
+        </select>
+        <br><br>
+
         <table class="table">
             <thead>
                 <tr>
