@@ -54,7 +54,7 @@
 <body>
     <div class="container">
         <h1>Appointment List</h1>
-        <table class="table">
+        <table id="appointmentTable">
             <thead>
                 <tr>
                     <th>Child Name</th>
@@ -67,8 +67,8 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-              <tbody id="appointmentTable"></tbody>
-        </table><br>
+            <tbody></tbody>
+        </table>
         <button class="button button-primary" onclick="window.location.href='add-appointment.html'">Add Appointment</button>
         <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
     </div>
