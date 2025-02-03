@@ -3,174 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Appointment | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-    <div class="formbold-main-wrapper">
-    <div class="formbold-form-wrapper">
-        <h1 style="text-align: center;">Appointment Record | KinderCare</h1>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-image: url('background.jpg');
-        }
-
-        h1 {
-            text-align: center;
-        }
-
-        table {
-            width: 90%;
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-
-        th {
-            padding: 10px;
-            text-align: center;
-            color : rgb(255, 255, 255);
-        }
-
-        th {
-            background-color: #0033ff;
-        }
-
-        td {
-            text-align: center;
-        }
-
-        button {
-            padding: 5px 10px;
-            margin: 5px;
-            cursor: pointer;
-            border: none;
-            border-radius: 4px;
-        }
-
-        .edit-btn {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .delete-btn {
-            background-color: #f44336;
-            color: white;
-        }
-
-        .edit-btn:hover {
-            background-color: #45a049;
-        }
-
-        .delete-btn:hover {
-            background-color: #d32f2f;
-        }
-     .formbold-form-wrapper {
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      width: 60%;
-      max-width: 1000px;
-      text-align: left;
-  }
-  .formbold-main-wrapper {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 48px;
-  }
-    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Edit Appointment</h1>
+        
+        <form id="editAppointmentForm">
+            <label for="childSelect">Select Child:</label>
+            <select id="childSelect" required>
+                <option value="">-- Select Child --</option>
+            </select>
+            <br><br>
 
-    <!-- Table to display the user input -->
-    <table>
-        <thead>
-            <tr>
-                <th>Children ID</th>
-                <th>Appointment Type</th>
-                <th>Healthcare Provider</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="appointmentTable">
-            <!-- Dynamic table rows will go here -->
-        </tbody>
-    </table>
-</div>
-</div>
+            <label for="AppointmentType">Appointment Type</label>
+            <select id="AppointmentType" name="AppointmentType" required>
+                <option value="vaccine">Vaccination</option>
+                <option value="checkup">Check Up</option>
+            </select><br>
 
-    <script>
-        // Function to display stored data in the table
-        function displayData() {
-            const child = localStorage.getItem('child');
-            const appointmentType = localStorage.getItem('appointmentType');
-            const healthcareProvider = localStorage.getItem('healthcareProvider');
-            const date = localStorage.getItem('date');
-            const time = localStorage.getItem('time');
+            <label for="HealthcareProvider">Healthcare Provider</label>
+            <input type="text" id="HealthcareProvider" name="HealthcareProvider" required>
 
-            if (child && appointmentType && healthcareProvider && date && time) {
-                const tableBody = document.getElementById('appointmentTable');
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${child}</td>
-                    <td>${appointmentType}</td>
-                    <td>${healthcareProvider}</td>
-                    <td>${date}</td>
-                    <td>${time}</td>
-                    <td>
-                        <button class="edit-btn" onclick="editRow()">Edit</button>
-                        <button class="delete-btn" onclick="deleteRow()">Delete</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
+            <label for="AppointmentDate">Appointment Date</label>
+            <input type="date" id="AppointmentDate" name="AppointmentDate" required>
+
+            <label for="AppointmentTime">Appointment Time</label>
+            <input type="time" id="AppointmentTime" name="AppointmentTime" required>
+
+            <label for="Status">Status</label>
+            <select id="Status" name="Status" required>
+                <option value="Pending">Pending</option>
+                <option value="Completed">Completed</option>
+                <option value="Missed">Missed</option>
+                <option value="Rescheduled">Rescheduled</option>
+            </select><br>
+
+            <label for="Remark">Remark</label>
+            <textarea id="Remark" name="Remark"></textarea>
+
+            <button type="submit" class="button">Update Appointment</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='appointment.html'">← Back</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const appointmentId = urlParams.get('id');
+
+        async function loadAppointmentDetails() {
+            const appointmentDoc = await getDoc(doc(db, "appointment", appointmentId));
+            if (appointmentDoc.exists()) {
+                const appointmentData = appointmentDoc.data();
+
+                document.getElementById("childSelect").value = appointmentData.childId;
+                document.getElementById("AppointmentType").value = appointmentData.appointmentType;
+                document.getElementById("HealthcareProvider").value = appointmentData.healthcareProvider;
+                document.getElementById("AppointmentDate").value = appointmentData.appointmentDate.toDate().toISOString().split('T')[0];
+                document.getElementById("AppointmentTime").value = appointmentData.appointmentTime;
+                document.getElementById("Status").value = appointmentData.status;
+                document.getElementById("Remark").value = appointmentData.remark;
+
+                loadChildren();
             } else {
-                const tableBody = document.getElementById('appointmentTable');
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No appointment details available. Please complete the form on the previous page.</td></tr>';
+                alert("Appointment not found.");
+                window.location.href = "appointment.html";
             }
         }
 
-        // Edit row functionality
-        function editRow() {
-            const child = localStorage.getItem('child');
-            const appointmentType = localStorage.getItem('appointmentType');
-            const healthcareProvider = localStorage.getItem('healthcareProvider');
-            const date = localStorage.getItem('date');
-            const time = localStorage.getItem('time');
+        async function loadChildren() {
+            const childrenDropdown = document.getElementById("childSelect");
 
-            // Set the data back into the form (for user to edit)
-            document.getElementById('child').value = child;
-            document.getElementById('appointmentType').value = appointmentType;
-            document.getElementById('healthcareProvider').value = healthcareProvider;
-            document.getElementById('date').value = date;
-            document.getElementById('time').value = time;
-
-            // Optionally, you can update the values after editing
-            // Add save functionality to update localStorage after editing
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenSnapshot.forEach((docSnap) => {
+                const childData = docSnap.data();
+                const option = document.createElement("option");
+                option.value = docSnap.id;
+                option.textContent = childData.ChildName;
+                childrenDropdown.appendChild(option);
+            });
         }
 
-        // Delete row functionality
-        function deleteRow() {
-            if (confirm('Are you sure you want to delete this appointment?')) {
-                // Remove from localStorage
-                localStorage.removeItem('child');
-                localStorage.removeItem('appointmentType');
-                localStorage.removeItem('healthcareProvider');
-                localStorage.removeItem('date');
-                localStorage.removeItem('time');
+        document.getElementById("editAppointmentForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-                // Reload the page to refresh the table
-                window.location.reload();
+            const updatedAppointment = {
+                childId: document.getElementById("childSelect").value,
+                appointmentType: document.getElementById("AppointmentType").value,
+                healthcareProvider: document.getElementById("HealthcareProvider").value,
+                appointmentDate: new Date(document.getElementById("AppointmentDate").value),
+                appointmentTime: document.getElementById("AppointmentTime").value,
+                status: document.getElementById("Status").value,
+                remark: document.getElementById("Remark").value
+            };
+
+            try {
+                await updateDoc(doc(db, "appointment", appointmentId), updatedAppointment);
+                alert("Appointment updated successfully.");
+                window.location.href = "appointment.html";
+            } catch (error) {
+                console.error("Error updating appointment:", error);
+                alert("There was an error updating the appointment.");
             }
-        }
+        });
 
-        // Initialize the page by displaying the data
-        displayData();
+        document.addEventListener("DOMContentLoaded", loadAppointmentDetails);
     </script>
 </body>
 </html>
