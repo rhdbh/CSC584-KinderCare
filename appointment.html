@@ -73,7 +73,12 @@
 
                 const row = document.createElement("tr");
 
-                if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
+                // Tukar warna mengikut status
+                if (appointment.status === "Rescheduled") {
+                    row.style.backgroundColor = "#FFF8DC";
+                } else if (appointment.status === "Completed") {
+                    row.style.backgroundColor = "#DFFFD6";
+                } else if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
                     const appointmentDate = appointment.appointmentDate.toDate();
                     const daysLeft = Math.floor((appointmentDate - new Date()) / (1000 * 60 * 60 * 24));
 
