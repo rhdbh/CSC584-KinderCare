@@ -5,12 +5,12 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth
 
 // Firebase Configuration
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_MESSAGING_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+  authDomain: "kindercare-cd7da.firebaseapp.com",
+  projectId: "kindercare-cd7da",
+  storageBucket: "kindercare-cd7da.firebasestorage.app",
+  messagingSenderId: "930908122510",
+  appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
 };
 
 // Initialize Firebase
