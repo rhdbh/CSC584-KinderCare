@@ -72,16 +72,6 @@ h1 {
     background-color: #5a6268;
 }
 
-.button-complete {
-     background-color: #28a745;
-     color: white;
-}
-
-.button-complete:hover {
-     background-color: #19692c;
-     color: white;
-}
-    
 .logout-button {
     position: absolute;
     top: 20px;
