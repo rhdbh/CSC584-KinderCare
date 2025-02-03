@@ -10,7 +10,7 @@
     <div class="container">
         <h1>Vaccine Records</h1>
 
-        <table class="table">
+        <table id="vaccineTable">
             <thead>
                 <tr>
                     <th>Child Name</th>
@@ -20,17 +20,16 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="vaccineTable"></tbody>
+            <tbody>
+                <!-- Vaccine records will be populated here -->
+            </tbody>
         </table>
-        
-        <br>
-        <button class="button" onclick="window.location.href='add-vaccine.html'">+ Add Vaccine</button>
-        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+        <button class="button" onclick="window.location.href='add-vaccine.html'">Add Vaccine</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
@@ -44,71 +43,86 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function loadVaccineRecords() {
-            const vaccineTable = document.getElementById("vaccineTable");
-            vaccineTable.innerHTML = "";
-
+        async function loadVaccineData() {
             const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
-            const childrenMap = {};
+            const vaccineTableBody = document.getElementById("vaccineTable").getElementsByTagName("tbody")[0];
 
-            const childrenSnapshot = await getDocs(collection(db, "children"));
-            childrenSnapshot.forEach((childDoc) => {
-                childrenMap[childDoc.id] = childDoc.data();
-            });
+            vaccineSnapshot.forEach((vaccineDoc) => {
+                const vaccineData = vaccineDoc.data();
+                const vaccineId = vaccineDoc.id;
 
-            vaccineSnapshot.forEach((docSnap) => {
-                const vaccineData = docSnap.data();
-                const vaccineId = docSnap.id;
-                const childData = childrenMap[vaccineData.childId] || { ChildName: "Unknown" };
-                const childName = childData.ChildName;
+                // Create a new row for each vaccine record
+                const row = vaccineTableBody.insertRow();
 
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${childName}</td>
-                    <td id="status-${vaccineId}">${vaccineData.status}</td>
-                    <td>${vaccineData.vaccineDate}</td>
-                    <td>${vaccineData.vaccineType}</td>
-                    <td>
-                        <button class="button" onclick="editVaccine('${vaccineId}')">Edit</button>
-                        <button class="button button-secondary" onclick="deleteVaccine('${vaccineId}')">Delete</button>
-                        <button class="button button-complete" onclick="completeVaccine('${vaccineId}')">Complete</button>
-                    </td>
-                `;
-                vaccineTable.appendChild(row);
+                const cell1 = row.insertCell(0);
+                const cell2 = row.insertCell(1);
+                const cell3 = row.insertCell(2);
+                const cell4 = row.insertCell(3);
+                const cell5 = row.insertCell(4);
+
+                cell1.textContent = vaccineData.childName;
+                cell2.textContent = vaccineData.status;
+                cell3.textContent = vaccineData.vaccineDate;
+                cell4.textContent = vaccineData.vaccineType;
+
+                // Action buttons (Edit, Delete, Complete)
+                const editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+                editButton.classList.add("button");
+                editButton.onclick = function() {
+                    window.location.href = `edit-vaccine.html?id=${vaccineId}`;
+                };
+
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.classList.add("button", "button-danger");
+                deleteButton.onclick = function() {
+                    deleteVaccine(vaccineId);
+                };
+
+                const completeButton = document.createElement("button");
+                completeButton.textContent = "Complete";
+                completeButton.classList.add("button", "button-success");
+                completeButton.onclick = function() {
+                    updateVaccineStatus(vaccineId, "completed");
+                };
+
+                cell5.appendChild(editButton);
+                cell5.appendChild(deleteButton);
+                cell5.appendChild(completeButton);
             });
         }
 
+        // Function to delete a vaccine record
         async function deleteVaccine(vaccineId) {
-            const confirmDelete = confirm("Are you sure you want to delete this record?");
-            if (confirmDelete) {
-                try {
-                    await deleteDoc(doc(db, "vaccine", vaccineId));
-                    alert("Vaccine record deleted successfully.");
-                    loadVaccineRecords();
-                } catch (error) {
-                    console.error("Error deleting record:", error);
-                }
-            }
-        }
-
-        async function completeVaccine(vaccineId) {
             const vaccineRef = doc(db, "vaccine", vaccineId);
+
             try {
-                await updateDoc(vaccineRef, {
-                    status: "completed"
-                });
- 
-                document.getElementById(`status-${vaccineId}`).innerText = "completed";
+                await deleteDoc(vaccineRef);
+                alert("Vaccine record deleted.");
+                window.location.reload(); // Reload the page to update the table
             } catch (error) {
-                console.error("Error updating vaccine status:", error);
+                console.error("Error deleting vaccine: ", error);
+                alert("There was an error deleting the vaccine record.");
             }
         }
 
-        function editVaccine(vaccineId) {
-            window.location.href = `edit-vaccine.html?id=${vaccineId}`;
+        // Function to update vaccine status
+        async function updateVaccineStatus(vaccineId, status) {
+            const vaccineRef = doc(db, "vaccine", vaccineId);
+
+            try {
+                await updateDoc(vaccineRef, { status: status });
+                alert(`Vaccine status updated to ${status}.`);
+                window.location.reload(); // Reload the page to update the table
+            } catch (error) {
+                console.error("Error updating vaccine status: ", error);
+                alert("There was an error updating the vaccine status.");
+            }
         }
 
-        document.addEventListener("DOMContentLoaded", loadVaccineRecords);
+        // Load vaccine data when the page loads
+        document.addEventListener("DOMContentLoaded", loadVaccineData);
     </script>
 </body>
 </html>
