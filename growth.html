@@ -26,16 +26,24 @@
             const growthTable = document.getElementById("growthTable");
             growthTable.innerHTML = "";
 
-            const querySnapshot = await getDocs(collection(db, "growth"));
-            querySnapshot.forEach((docSnap) => {
+            const growthSnapshot = await getDocs(collection(db, "growth"));
+            const childrenMap = {};
+
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenSnapshot.forEach((childDoc) => {
+                childrenMap[childDoc.id] = childDoc.data().ChildName;
+            });
+
+            growthSnapshot.forEach((docSnap) => {
                 const growth = docSnap.data();
                 const growthId = docSnap.id;
+                const childName = childrenMap[growth.childId] || "Unknown";
 
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${growth.ChildName}</td>
-                    <td>${growth.Height} cm</td>
-                    <td>${growth.Weight} kg</td>
+                    <td>${childName}</td>
+                    <td>${growth.height} cm</td>
+                    <td>${growth.weight} kg</td>
                     <td>
                         <button class="button" onclick="editGrowth('${growthId}')">Edit</button>
                         <button class="button button-secondary" onclick="deleteGrowth('${growthId}')">Delete</button>
