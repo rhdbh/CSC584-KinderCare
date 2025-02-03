@@ -13,13 +13,13 @@
 
         <form id="editChildForm">
             <label for="childName">Child Name</label>
-            <input type="text" id="childName" name="childName" required>
+            <input type="text" id="ChildName" name="ChildName" required>
 
             <label for="DateOfBirth">Date of Birth</label>
             <input type="date" id="DateOfBirth" name="DateOfBirth" required>
 
             <label for="gender">Gender</label>
-            <select id="gender" name="gender" required>
+            <select id="Gender" name="Gender" required>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
             </select>
@@ -40,32 +40,64 @@
           appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
     };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Get the child's ID from the URL
         const urlParams = new URLSearchParams(window.location.search);
         const childId = urlParams.get('id');
 
-        // Fetch the child data from Firestore
         const childDocRef = doc(db, "children", childId);
         const docSnap = await getDoc(childDocRef);
 
         if (docSnap.exists()) {
             const childData = docSnap.data();
             
-            // Ensure all fields are correctly accessed
             console.log("Child Data:", childData);
 
-            // Pre-fill the form fields with the child's data
-            if (childData.childName) {
-                document.getElementById("childName").value = childData.childName;
+            if (childData.ChildName) {
+                document.getElementById("childName").value = childData.ChildName;
             } else {
                 console.log("Child name is missing or undefined.");
             }
             
-            if (childData.dob) {
-                document.getElementById("dob").value = childData.dob;
+            if (childData.DateOfBirth) {
+                document.getElementById("DateOfBirth").value = childData.DateOfBirth;
             } else
+                console.log("Date of Birth is missing or undefined.");
+            }
+        
+            if (childData.Gender) {
+                document.getElementById("Gender").value = childData.Gender;
+            } else {
+                console.log("Gender is missing or undefined.");
+            }
 
+            } else {
+            console.log("No such document!");
+            }
+        
+        const editChildForm = document.getElementById('editChildForm');
+        editChildForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const updatedChildName = document.getElementById("ChildName").value;
+            const updatedDateOfBirth = document.getElementById("DateOfBirth").value;
+            const updatedGender = document.getElementById("Gender").value;
+
+            try {
+                // Update the child's document in Firestore
+                await updateDoc(childDocRef, {
+                    childName: updatedChildName,
+                    DateOfBirth: updatedDateOfBirth,
+                    gender: updatedGender,
+                });
+
+                console.log("Child updated successfully!");
+                window.location.href = "children.html";
+            } catch (error) {
+                console.error("Error updating child: ", error);
+            }
+        });
+    </script>
+</body>
+</html>
