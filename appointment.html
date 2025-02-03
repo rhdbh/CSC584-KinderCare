@@ -102,21 +102,14 @@
 
             appointmentSnapshot.forEach((appointmentDoc) => {
                 const appointment = appointmentDoc.data();
-                const appointmentDate = new Date(appointment.appointmentDate.seconds * 1000);
-                const currentDate = new Date();
-                const dateDiff = Math.floor((appointmentDate - currentDate) / (1000 * 60 * 60 * 24));
-
-                const row = document.createElement("tr");
-                if (dateDiff <= 3) {
-                    row.style.backgroundColor = "#FFCCE5";
-                }
+                const appointmentDate = appointment.appointmentDate.toDate();
+                const appointmentDateString = appointmentDate.toDateString();
 
                 let actionButtons = `
                     <button onclick="editAppointment('${appointmentDoc.id}')">Edit</button>
                     <button onclick="deleteAppointment('${appointmentDoc.id}')">Delete</button>
                 `;
 
-                // Add buttons based on the status
                 if (appointment.status === "Pending") {
                     actionButtons = `
                         ${actionButtons}
@@ -134,12 +127,17 @@
                     `;
                 }
 
+                const row = document.createElement("tr");
+                if (Math.floor((appointmentDate - new Date()) / (1000 * 60 * 60 * 24)) <= 3) {
+                    row.style.backgroundColor = "#FFCCE5";
+                }
+
                 row.innerHTML = `
                     <td>${appointment.childName}</td>
                     <td>${appointment.appointmentType}</td>
                     <td>${appointment.status}</td>
                     <td>${appointment.healthcareProvider}</td>
-                    <td>${appointment.appointmentDate.toDateString()}</td>
+                    <td>${appointmentDateString}</td>
                     <td>${appointment.appointmentTime}</td>
                     <td>${appointment.remark}</td>
                     <td>${actionButtons}</td>
