@@ -8,16 +8,17 @@
 </head>
 <body>
     <div class="container">
+        <a href="children.html" class="button button-secondary">← Back to Children</a>
         <h1>Edit Child</h1>
 
         <form id="editChildForm">
-            <label for="childName">Child Name</label>
+            <label for="ChildName">Child Name</label>
             <input type="text" id="ChildName" name="ChildName" required>
 
             <label for="DateOfBirth">Date of Birth</label>
             <input type="date" id="DateOfBirth" name="DateOfBirth" required>
 
-            <label for="gender">Gender</label>
+            <label for="Gender">Gender</label>
             <select id="Gender" name="Gender" required>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
@@ -27,18 +28,19 @@
             <button type="button" class="button button-secondary" onclick="window.location.href='children.html'">← Back</button>
         </form>
     </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.1.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-          apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
-          authDomain: "kindercare-cd7da.firebaseapp.com",
-          projectId: "kindercare-cd7da",
-          storageBucket: "kindercare-cd7da.firebasestorage.app",
-          messagingSenderId: "930908122510",
-          appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -46,36 +48,21 @@
         const urlParams = new URLSearchParams(window.location.search);
         const childId = urlParams.get('id');
 
-        const childDocRef = doc(db, "children", childId);
-        const docSnap = await getDoc(childDocRef);
+        if (childId) {
+            const childDocRef = doc(db, "children", childId);
 
-        if (docSnap.exists()) {
-            const childData = docSnap.data();
-            
-            console.log("Child Data:", childData);
+            getDoc(childDocRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                    const childData = docSnap.data();
+                    document.getElementById("ChildName").value = childData.ChildName || "";
+                    document.getElementById("DateOfBirth").value = childData.DateOfBirth || "";
+                    document.getElementById("Gender").value = childData.Gender || "Male";
+                }
+            }).catch((error) => {
+                console.error("Error fetching child data:", error);
+            });
+        }
 
-            if (childData.ChildName) {
-                document.getElementById("childName").value = childData.ChildName;
-            } else {
-                console.log("Child name is missing or undefined.");
-            }
-            
-            if (childData.DateOfBirth) {
-                document.getElementById("DateOfBirth").value = childData.DateOfBirth;
-            } else
-                console.log("Date of Birth is missing or undefined.");
-            }
-        
-            if (childData.Gender) {
-                document.getElementById("Gender").value = childData.Gender;
-            } else {
-                console.log("Gender is missing or undefined.");
-            }
-
-            } else {
-            console.log("No such document!");
-            }
-        
         const editChildForm = document.getElementById('editChildForm');
         editChildForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -85,14 +72,12 @@
             const updatedGender = document.getElementById("Gender").value;
 
             try {
-                // Update the child's document in Firestore
-                await updateDoc(childDocRef, {
-                    childName: updatedChildName,
+                await updateDoc(doc(db, "children", childId), {
+                    ChildName: updatedChildName,
                     DateOfBirth: updatedDateOfBirth,
                     Gender: updatedGender,
                 });
 
-                console.log("Child updated successfully!");
                 window.location.href = "children.html";
             } catch (error) {
                 console.error("Error updating child: ", error);
