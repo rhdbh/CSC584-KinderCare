@@ -1,30 +1,12 @@
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "kindercare";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$sql = "SELECT UserID, UserName FROM user";
-$result = $conn->query($sql);
-
-$users = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $users[] = $row;
-    }
-}
-?>
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Children | KinderCare</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .container {
@@ -56,12 +38,6 @@ if ($result->num_rows > 0) {
             margin: 0 auto;
             display: block;
         }
-        .radio-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 10px 0;
-        }
         .button {
             background-color: #007bff;
             color: white;
@@ -80,14 +56,11 @@ if ($result->num_rows > 0) {
 <body>
     <div class="container">
         <h1>Add Child Details</h1>
-        <form action="add_children.php" method="POST">
+        <form id="addChildForm">
             <div class="form-group">
                 <label for="userID">Parent's Name</label>
                 <select id="userID" name="userID" required>
                     <option value="">Select a user</option>
-                    <?php foreach ($users as $user): ?>
-                        <option value="<?= $user['UserID']; ?>"><?= $user['UserName']; ?></option>
-                    <?php endforeach; ?>
                 </select>
             </div>
 
@@ -101,16 +74,70 @@ if ($result->num_rows > 0) {
                 <input type="date" id="dateOfBirth" name="dateOfBirth" required>
             </div>
 
-			<div class="form-group">
-				<label for="gender">Gender</label>
-				<select id="gender" name="gender" required>
-				<option value="">Select Gender</option>
-				<option value="Male">Male</option>
-				<option value="Female">Female</option>
-				</select>
-			</div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
             <button type="submit" class="button">Add Child</button>
         </form>
     </div>
-</body>
-</html>
+
+    <script>
+        // ✅ Step 1: Firebase Configuration (Replace with your config)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // ✅ Step 2: Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // ✅ Step 3: Populate User Dropdown (Fetching from Firestore)
+        async function loadUsers() {
+            const userSelect = document.getElementById("userID");
+            const usersRef = db.collection("users");
+            const snapshot = await usersRef.get();
+
+            snapshot.forEach(doc => {
+                let option = document.createElement("option");
+                option.value = doc.id;
+                option.textContent = doc.data().UserName;
+                userSelect.appendChild(option);
+            });
+        }
+        loadUsers(); // Call function to load users into dropdown
+
+        // ✅ Step 4: Handle Form Submission
+        document.getElementById("addChildForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const userID = document.getElementById("userID").value;
+            const childName = document.getElementById("childName").value;
+            const dateOfBirth = document.getElementById("dateOfBirth").value;
+            const gender = document.getElementById("gender").value;
+
+            if (!userID || !childName || !dateOfBirth || !gender) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                await db.collection("children").add({
+                    userID,
+                    childName,
+                    dateOfBirth,
+                    gender,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                alert("Child added successfully!");
+                docum
