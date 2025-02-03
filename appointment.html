@@ -150,12 +150,14 @@
                 <!-- Children options will be dynamically populated here -->
             </select>
 
-            <label>Choose Appointment:</label>
-            <input type="radio" id="vaccination" name="appointment" value="Vaccination" required>
-            <label for="vaccination">Vaccination</label>
-            <input type="radio" id="baby_checkup" name="appointment" value="Baby Checkup" required>
-            <label for="baby_checkup">Baby Checkup</label>
-
+           <div class="formbold-mb-5">
+              <label class="formbold-form-label formbold-form-label-2">Choose Appointment</label>
+              <form id="appointmentForm">
+                  <input type="radio" id="vaccination" name="appointment" value="vaccination">
+                  <label for="vaccination">Vaccination</label>
+                  <input type="radio" id="baby_checkup" name="appointment" value="baby_checkup">
+                  <label for="baby_checkup">Baby Checkup</label><br>
+          </div>
             <label for="healthcare">Healthcare Provider:</label>
             <input type="text" name="healthcare" id="healthcare" placeholder="Insert your healthcare provider" required>
 
