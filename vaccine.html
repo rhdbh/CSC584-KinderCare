@@ -1,46 +1,112 @@
-<?php
-require 'firebase.php';
-
-// Ambil data dari Firebase
-$vaccineLogs = $database->getReference('vaccine_logs')->getValue();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vaccine Log</title>
+    <title>Vaccine Records | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <h1>Vaccine Log</h1>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Child Name</th>
-                <th>Vaccine Type</th>
-                <th>Date</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($vaccineLogs)): ?>
-                <?php foreach ($vaccineLogs as $key => $log): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($log['childName']); ?></td>
-                        <td><?= htmlspecialchars($log['vaccineType']); ?></td>
-                        <td><?= htmlspecialchars($log['date']); ?></td>
-                        <td><?= htmlspecialchars($log['status']); ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+    <div class="container">
+        <h1>Vaccine Records</h1>
+
+        <table class="table">
+            <thead>
                 <tr>
-                    <td colspan="4">No vaccine records found.</td>
+                    <th>Child Name</th>
+                    <th>Status</th>
+                    <th>Vaccine Date</th>
+                    <th>Vaccine Type</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
-    <br>
-    //<a href="add_vaccine_log.php">Add Vaccine Log</a>
+            </thead>
+            <tbody id="vaccineTable"></tbody>
+        </table>
+        
+        <br>
+        <button class="button" onclick="window.location.href='add-vaccine.html'">+ Add Vaccine</button>
+        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadVaccineRecords() {
+            const vaccineTable = document.getElementById("vaccineTable");
+            vaccineTable.innerHTML = "";
+
+            const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
+            const childrenMap = {};
+
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenSnapshot.forEach((childDoc) => {
+                childrenMap[childDoc.id] = childDoc.data();
+            });
+
+            vaccineSnapshot.forEach((docSnap) => {
+                const vaccineData = docSnap.data();
+                const vaccineId = docSnap.id;
+                const childData = childrenMap[vaccineData.childId] || { ChildName: "Unknown" };
+                const childName = childData.ChildName;
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${childName}</td>
+                    <td id="status-${vaccineId}">${vaccineData.status}</td>
+                    <td>${vaccineData.vaccineDate}</td>
+                    <td>${vaccineData.vaccineType}</td>
+                    <td>
+                        <button class="button" onclick="editVaccine('${vaccineId}')">Edit</button>
+                        <button class="button button-secondary" onclick="deleteVaccine('${vaccineId}')">Delete</button>
+                        <button class="button button-complete" onclick="completeVaccine('${vaccineId}')">Complete</button>
+                    </td>
+                `;
+                vaccineTable.appendChild(row);
+            });
+        }
+
+        async function deleteVaccine(vaccineId) {
+            const confirmDelete = confirm("Are you sure you want to delete this record?");
+            if (confirmDelete) {
+                try {
+                    await deleteDoc(doc(db, "vaccine", vaccineId));
+                    alert("Vaccine record deleted successfully.");
+                    loadVaccineRecords();
+                } catch (error) {
+                    console.error("Error deleting record:", error);
+                }
+            }
+        }
+
+        async function completeVaccine(vaccineId) {
+            try {
+                await updateDoc(doc(db, "vaccine", vaccineId), {
+                    status: "completed"
+                });
+                document.getElementById(`status-${vaccineId}`).innerText = "completed";
+            } catch (error) {
+                console.error("Error updating vaccine status:", error);
+            }
+        }
+
+        function editVaccine(vaccineId) {
+            window.location.href = `edit-vaccine.html?id=${vaccineId}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", loadVaccineRecords);
+    </script>
 </body>
 </html>
