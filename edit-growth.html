@@ -1,128 +1,103 @@
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "kindercare";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$sql = "SELECT UserID, UserName FROM user";
-$result = $conn->query($sql);
-
-$users = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $users[] = $row;
-    }
-}
-
-if (isset($_GET['childrenID'])) {
-    $childID = $_GET['childrenID'];
-    $sql = "SELECT * FROM child WHERE ChildrenID = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $childrenID);
-    $stmt->execute();
-    $child_result = $stmt->get_result();
-    
-    if ($child_result->num_rows > 0) {
-        $child = $child_result->fetch_assoc();
-    } else {
-        die("Child's record not found.");
-    }
-}
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $childID = $_POST['childrenID'];
-    $childName = $_POST['childrenName'];
-    $age = $_POST['c.Age'];
-    $height = $_POST['c.Height'];
-	$month = $_POST['c.Month'];
-	$headCircum = $_POST['c.HeadCircum'];
-
-$sql = "UPDATE child SET UserID = ?, ChildName = ?, age = ?, height = ?, month = ?, height = ? WHERE ChildID = ?";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ssssi", $userID, $childName, $age, $height, $month, $headCircum );
-if ($stmt->execute()) {
-     echo "<script>alert('Child edited successfully!'); window.location.href = 'growth.php';</script>";
-} else {
-    echo "Error editing record: " . $conn->error;
-}
-
-}
-?>
-
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Child Details | KinderCare</title>
+    <title>Edit Growth Record | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .container_2 {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            text-align: center;
-        }
-        input[type="text"], input[type="date"], select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 14px;
-            box-sizing: border-box;
-            margin: 0 auto;
-            display: block;
-        }
-        .radio-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 10px 0;
-        }
-        .button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Edit Growth Record</h1>
 
-<div class="container">
-        <h1>Edit Child Details</h1>
-        <form action="edit-children.php?childID=<?= $childID ?>" method="POST">
-            <div class="form-group">
-                <label for="userID">Parent's Name</label>
-                <select id="userID" name="userID" required>
-                    <option value="">Select a user</option>
-                    <?php foreach ($users as $user): ?>
-                        <option value="<?= $user['UserID']; ?>" <?= ($user['UserID'] == $child['UserID']) ? 'selected' : ''; ?>><?= $user['UserName']; ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+        <form id="editGrowthForm">
+            <label for="ChildName">Child Name</label>
+            <input type="text" id="ChildName" name="ChildName" disabled required>
+
+            <label for="Age">Age (in months)</label>
+            <input type="number" id="Age" name="Age" required>
+
+            <label for="Height">Height (cm)</label>
+            <input type="number" id="Height" name="Height" required>
+
+            <label for="Weight">Weight (kg)</label>
+            <input type="number" id="Weight" name="Weight" required>
+
+            <button type="submit" class="button">Update Growth Record</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='growth.html'">← Back</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const growthId = urlParams.get('id');
+
+        if (growthId) {
+            const growthDocRef = doc(db, "growth", growthId);
+
+            getDoc(growthDocRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                    const growthData = docSnap.data();
+                    const childId = growthData.childId;
+
+                    // Fetch child name using childId
+                    const childDocRef = doc(db, "children", childId);
+                    getDoc(childDocRef).then((childDocSnap) => {
+                        if (childDocSnap.exists()) {
+                            const childData = childDocSnap.data();
+                            document.getElementById("ChildName").value = childData.ChildName || "";
+                        }
+                    }).catch((error) => {
+                        console.error("Error fetching child data:", error);
+                    });
+
+                    // Populate growth record data into the form
+                    document.getElementById("Age").value = growthData.age || "";
+                    document.getElementById("Height").value = growthData.height || "";
+                    document.getElementById("Weight").value = growthData.weight || "";
+                }
+            }).catch((error) => {
+                console.error("Error fetching growth record data:", error);
+            });
+        }
+
+        const editGrowthForm = document.getElementById('editGrowthForm');
+        editGrowthForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const updatedAge = document.getElementById("Age").value;
+            const updatedHeight = document.getElementById("Height").value;
+            const updatedWeight = document.getElementById("Weight").value;
+
+            try {
+                // Update the growth record with the new details
+                await updateDoc(doc(db, "growth", growthId), {
+                    age: updatedAge,
+                    height: updatedHeight,
+                    weight: updatedWeight,
+                });
+
+                alert("Growth record updated successfully!");
+                window.location.href = "growth.html"; // Redirect to the growth records page
+            } catch (error) {
+                console.error("Error updating growth record:", error);
+            }
+        });
+    </script>
+</body>
+</html>
