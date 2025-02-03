@@ -12,8 +12,7 @@
 
         <form id="editVaccineForm">
             <label for="ChildName">Child Name</label>
-            <select id="ChildName" name="ChildName" required>
-            </select>
+            <input type="text" id="ChildName" name="ChildName" disabled required>
 
             <label for="Status">Status</label>
             <select id="Status" name="Status" required>
@@ -62,29 +61,23 @@
                     document.getElementById("VaccineType").value = vaccineData.vaccineType || "";
                     document.getElementById("Status").value = vaccineData.status || "pending";
 
-                    populateChildrenDropdown(vaccineData.childId);
+                    populateChildrenTextField(vaccineData.childId);
                 } else {
                     alert("Vaccine record not found.");
                 }
             }
         }
 
-        async function populateChildrenDropdown(selectedChildId) {
-            const childrenSnapshot = await getDocs(collection(db, "children"));
-            const childSelect = document.getElementById("ChildName");
+        async function populateChildrenTextField(selectedChildId) {
+            const childRef = doc(db, "children", selectedChildId);
+            const childSnap = await getDoc(childRef);
 
-            childrenSnapshot.forEach((childDoc) => {
-                const childData = childDoc.data();
-                const option = document.createElement("option");
-                option.value = childDoc.id;
-                option.textContent = childData.ChildName;
-
-                if (childDoc.id === selectedChildId) {
-                    option.selected = true;
-                }
-
-                childSelect.appendChild(option);
-            });
+            if (childSnap.exists()) {
+                const childData = childSnap.data();
+                document.getElementById("ChildName").value = childData.ChildName;
+            } else {
+                alert("Child record not found.");
+            }
         }
 
         const editVaccineForm = document.getElementById("editVaccineForm");
