@@ -15,8 +15,8 @@ body, html {
 /* Container styling */
 .container {
     background: #fff;
-    padding: 100px;
-    border-radius: 8px;
+    padding: 50px;
+    border-radius: 10px;
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
     max-width:800px; /* Adjusted for larger container needs */
