@@ -62,7 +62,7 @@
                     <td>
                         <button class="button" onclick="editVaccine('${vaccineId}')">Edit</button>
                         <button class="button button-secondary" onclick="deleteVaccine('${vaccineId}')">Delete</button>
-                        <button class="button button-complete" onclick="completeVaccine('${vaccineId}')" ${vaccine.status === 'completed' ? 'style="display:none"' : ''}>Complete</button>
+                        <button class="button button-complete" onclick="completeVaccine('${vaccineId}')" ${vaccine.status === 'Completed' ? 'style="display:none"' : ''}>Complete</button>
                     </td>
                 `;
                 vaccineTable.appendChild(row);
