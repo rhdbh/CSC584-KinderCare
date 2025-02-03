@@ -110,28 +110,24 @@ h1 {
     background-color: #0056b3;
 }
 
-.vaccine-table {
+.table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
 }
 
-.vaccine-table th, .vaccine-table td {
+.table th, .table td {
     border: 1px solid #ddd;
     text-align: center;
     padding: 10px;
 }
 
-.vaccine-table th {
+.table th {
     background-color: #007BFF;
     color: white;
 }
 
-.vaccine-table tr:nth-child(even) {
-    background-color: #f2f2f2;
-}
-
-.vaccine-table tr:hover {
+.table tr:hover {
      background-color: #f1f1f1;
 }
 
@@ -177,12 +173,12 @@ h1 {
      background-color: #c82333;
 }
 
-.add-vaccine {
+.add-data {
      text-align: center;
      margin: 20px 0;
 }
 
-.add-vaccine button {
+.add-data button {
      background-color: #007BFF;
      color: white;
      padding: 10px 20px;
@@ -193,10 +189,9 @@ h1 {
      transition: background 0.3s ease;
 }
 
-.add-vaccine button:hover {
+.add-data button:hover {
     background-color: #0056b3;
 }
-
 
 /* Form styles */
 form {
