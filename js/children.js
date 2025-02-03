@@ -1,35 +1,55 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+// Import Firestore functions
+import { db } from "./firebase-config.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Firebase Config
-const firebaseConfig = { /* Your Firebase Config Here */ };
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+// Reference to the "children" collection
+const childrenCollection = collection(db, "children");
 
-// Add Child
-document.getElementById("addChildForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    
-    const childName = document.getElementById("childName").value;
-    const dateOfBirth = document.getElementById("dateOfBirth").value;
-    const gender = document.getElementById("gender").value;
+// Function to fetch and display children data
+async function fetchChildren() {
+    try {
+        const querySnapshot = await getDocs(childrenCollection);
+        const tableBody = document.getElementById("childrenTable");
+        tableBody.innerHTML = ""; // Clear existing table data
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                await addDoc(collection(db, "children"), {
-                    ChildName: childName,
-                    DateOfBirth: new Date(dateOfBirth).toISOString(),
-                    Gender: gender,
-                    ParentID: user.uid
-                });
-                alert("Child added successfully!");
-                window.location.href = "children.html";
-            } catch (error) {
-                console.error("Error adding child:", error);
-            }
+        if (querySnapshot.empty) {
+            tableBody.innerHTML = `<tr><td colspan="5">No child found.</td></tr>`;
+            return;
         }
-    });
-});
+
+        querySnapshot.forEach((doc) => {
+            const child = doc.data();
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${child.ChildName}</td>
+                <td>${child.DateOfBirth}</td>
+                <td>${calculateAge(child.DateOfBirth)}</td>
+                <td>${child.Gender}</td>
+                <td>
+                    <button class="edit-button" onclick="editChild('${doc.id}')">✏️ Edit</button>
+                    <button class="delete-button" onclick="deleteChild('${doc.id}')">🗑️ Delete</button>
+                </td>
+            `;
+
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching children data:", error);
+    }
+}
+
+// Function to calculate age from birth date
+function calculateAge(birthDate) {
+    const dob = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+    return age;
+}
+
+// Call function to load children data on page load
+fetchChildren();
