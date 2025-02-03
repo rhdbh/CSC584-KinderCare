@@ -1,122 +1,88 @@
-<?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "kindercare";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $childID = $_POST['childrenID'];
-    $childName = $_POST['childrenName'];
-	$age = $_POST['c.Age'];
-    $height = $_POST['c.height'];
-    $month = $_POST['c.Month'];
-	$headCircum = $_POST['c.HeadCircum'];
-
-    $sql = "INSERT INTO child (childrenID, childrenName, c.Age, c.height,  c.Month, c.HeadCircum ) VALUES (?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("isss", $childID, $childName, $age , $gender);
-
-    if ($stmt->execute()) {
-        echo "<script>alert('Child added successfully!'); window.location.href = 'add-growth.php';</script>";
-    } else {
-        echo "Error: " . $conn->error;
-    }
-    $stmt->close();
-}
-
-$conn->close();
-?>
-
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Child Growth</title>
+    <title>Add Growth Record | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .container_2 {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            text-align: center;
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadChildren() {
+            const childSelect = document.getElementById("childSelect");
+            childSelect.innerHTML = "<option value=''>Select Child</option>";
+            
+            const querySnapshot = await getDocs(collection(db, "children"));
+            querySnapshot.forEach((docSnap) => {
+                const child = docSnap.data();
+                const option = document.createElement("option");
+                option.value = docSnap.id;
+                option.textContent = child.ChildName;
+                childSelect.appendChild(option);
+            });
         }
-        .form-group {
-            margin-bottom: 15px;
+
+        async function addGrowth(event) {
+            event.preventDefault();
+            
+            const childId = document.getElementById("childSelect").value;
+            const height = document.getElementById("height").value;
+            const weight = document.getElementById("weight").value;
+
+            if (!childId || !height || !weight) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "growth"), {
+                    ChildId: childId,
+                    Height: height,
+                    Weight: weight,
+                    Timestamp: new Date().toISOString()
+                });
+                alert("Growth record added successfully!");
+                window.location.href = "growth.html";
+            } catch (error) {
+                console.error("Error adding growth record:", error);
+            }
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 14px;
-            text-align: center;
-        }
-       
-        .radio-group {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 10px 0;
-        }
-        .button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+        
+        document.addEventListener("DOMContentLoaded", loadChildren);
+        window.addGrowth = addGrowth;
+    </script>
 </head>
 <body>
+    <div class="container">
+        <h1>Add Growth Record</h1>
+        <form id="addGrowthForm" onsubmit="addGrowth(event)">
+            <label for="childSelect">Select Child:</label>
+            <select id="childSelect" required></select>
 
-<div class="container">
-        <h1>Add New Child Growth Details</h1>
-        <form action="add-growth.php?childID=<?= $childID ?>" method="POST">
-           
-			
-			<div class="form-group">
-                <label for="childName">Child's Name</label>
-                <input type="text" id="childName" name="childName" placeholder="Enter Child's Name" required>
-            </div>
-			
-			
-			<div class="form-group">
-                <label for="childAge">Child's Age</label>
-                <input type="text" id="childAge" name="childAge" placeholder="Enter Child's Age" required>
-            </div>
-			
-			<div class="form-group">
-                <label for="childHeight">Child's Height</label>
-                <input type="text" id="childHeight" name="childHeight" placeholder="Enter Child's Height" required>
-            </div>
-			
-			
-			<div class="form-group">
-                <label for="childMonth">Month</label>
-                <input type="text" id="childMonth" name="childMonth" placeholder="Enter Month" required>
-            </div>
-			
-			<div class="form-group">
-                <label for="childMonth">Head Circumference</label>
-                <input type="text" id="childCircum" name="childCircum" placeholder="Enter Circumference" required>
-            </div>
-			
-			<button type="submit" class="button">Add Child Growth</button>
-			<button type="submit" class="button" onclick="document.location='growth.html'">Back to Home</button>
+            <label for="height">Height (cm):</label>
+            <input type="number" id="height" required>
+
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" required>
+
+            <br>
+            <button type="submit" class="button">+ Add Growth Record</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='growth.html'">← Back</button>
+        </form>
+    </div>
 </body>
 </html>
