@@ -24,6 +24,27 @@ body, html {
     position: relative; /* Allow positioning of elements like logout button */
 }
 
+.card-container {
+    display: flex;  /* Enables horizontal layout */
+    flex-direction: row; /* Ensures cards are in a row */
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Aligns items vertically */
+    gap: 20px; /* Space between cards */
+    flex-wrap: wrap; /* Allows wrapping if screen is small */
+    width: 100%; /* Ensures it takes full width */
+    padding: 20px;
+}
+
+.card {
+    width: 150px; /* Adjust width */
+    text-align: center;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+
 /* Text styling */
 h1 {
     color: #333;
