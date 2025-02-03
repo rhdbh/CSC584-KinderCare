@@ -58,13 +58,6 @@
         <h1>Add Child Details</h1>
         <form id="addChildForm">
             <div class="form-group">
-                <label for="userID">Parent's Name</label>
-                <select id="userID" name="userID" required>
-                    <option value="">Select a user</option>
-                </select>
-            </div>
-
-            <div class="form-group">
                 <label for="childName">Child's Name</label>
                 <input type="text" id="childName" name="childName" placeholder="Enter Child's Name" required>
             </div>
@@ -87,15 +80,14 @@
     </div>
 
     <script>
-        // ✅ Step 1: Firebase Configuration (Replace with your config)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+  authDomain: "kindercare-cd7da.firebaseapp.com",
+  projectId: "kindercare-cd7da",
+  storageBucket: "kindercare-cd7da.firebasestorage.app",
+  messagingSenderId: "930908122510",
+  appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+};
 
         // ✅ Step 2: Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -140,4 +132,11 @@
                 });
 
                 alert("Child added successfully!");
-                docum
+                document.getElementById("addChildForm").reset();
+            } catch (error) {
+                console.error("Error adding child: ", error);
+                alert("Error adding child. Try again.");
+            }
+        });
+    </script>
+</body>
