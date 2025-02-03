@@ -86,15 +86,16 @@
             const selectedChildSnapshot = await getDoc(doc(db, "children", selectedChildId));
             const selectedChildName = selectedChildSnapshot.data().ChildName;
     
-            const newAppointment = {
-                childName: selectedChildName,
-                appointmentType: document.getElementById("AppointmentType").value,
-                healthcareProvider: document.getElementById("HealthcareProvider").value,
-                appointmentDate: new Date(document.getElementById("AppointmentDate").value),
-                appointmentTime: document.getElementById("AppointmentTime").value,
-                status: document.getElementById("Status").value,
-                remark: document.getElementById("Remark").value
-            };
+const newAppointment = {
+    childId: selectedChildId,
+    childName: selectedChildName,
+    appointmentType: document.getElementById("AppointmentType").value,
+    healthcareProvider: document.getElementById("HealthcareProvider").value,
+    appointmentDate: new Date(document.getElementById("AppointmentDate").value),
+    appointmentTime: document.getElementById("AppointmentTime").value,
+    status: document.getElementById("Status").value,
+    remark: document.getElementById("Remark").value
+};
     
             try {
                 const appointmentRef = doc(collection(db, "appointment"));
