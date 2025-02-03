@@ -5,6 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Appointment | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .form-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            width: 150px;
+        }
+
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .button {
+            padding: 10px 15px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button-secondary {
+            background-color: #f44336;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -16,28 +45,38 @@
                 <option value="" disabled selected>Select Child</option>
             </select><br>
 
-            <label for="AppointmentType">Appointment Type</label>
-            <select id="AppointmentType" name="AppointmentType" required>
-                <option value="vaccine">Vaccination</option>
-                <option value="checkup">Checkup / Follow Up</option>
-            </select><br>
+            <div class="form-group">
+                <div>
+                    <label for="AppointmentType">Appointment Type</label>
+                    <select id="AppointmentType" name="AppointmentType" required>
+                        <option value="vaccine">Vaccination</option>
+                        <option value="checkup">Checkup / Follow Up</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="Status">Status</label>
+                    <select id="Status" name="Status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Missed">Missed</option>
+                        <option value="Rescheduled">Rescheduled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div>
+                    <label for="AppointmentDate">Appointment Date</label>
+                    <input type="date" id="AppointmentDate" name="AppointmentDate" required>
+                </div>
+                <div>
+                    <label for="AppointmentTime">Appointment Time</label>
+                    <input type="time" id="AppointmentTime" name="AppointmentTime" required>
+                </div>
+            </div>
 
             <label for="HealthcareProvider">Healthcare Provider</label>
             <input type="text" id="HealthcareProvider" name="HealthcareProvider" required>
-
-            <label for="AppointmentDate">Appointment Date</label>
-            <input type="date" id="AppointmentDate" name="AppointmentDate" required>
-
-            <label for="AppointmentTime">Appointment Time</label>
-            <input type="time" id="AppointmentTime" name="AppointmentTime" required>
-
-            <label for="Status">Status</label>
-            <select id="Status" name="Status" required>
-                <option value="Pending">Pending</option>
-                <option value="Completed">Completed</option>
-                <option value="Missed">Missed</option>
-                <option value="Rescheduled">Rescheduled</option>
-            </select><br>
 
             <label for="Remark">Remark</label>
             <textarea id="Remark" name="Remark"></textarea>
