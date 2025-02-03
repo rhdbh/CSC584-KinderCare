@@ -15,12 +15,12 @@
             <select id="childSelect" required>
                 <option value="">-- Select Child --</option>
             </select>
-            <br><br>
-    
+            <br>
+            
             <label for="AppointmentType">Appointment Type</label>
             <select id="AppointmentType" name="AppointmentType" required>
-                <option value="vaccine">Vaccination</option>
-                <option value="checkup">Check Up</option>
+                <option value="Vaccination">Vaccination</option>
+                <option value="Check Up">Check Up</option>
             </select><br>
     
             <label for="HealthcareProvider">Healthcare Provider</label>
@@ -87,7 +87,7 @@
             const selectedChildName = selectedChildSnapshot.data().ChildName;
     
             const newAppointment = {
-                childName: selectedChildName,  // Send the child name, not ID
+                childName: selectedChildName,
                 appointmentType: document.getElementById("AppointmentType").value,
                 healthcareProvider: document.getElementById("HealthcareProvider").value,
                 appointmentDate: new Date(document.getElementById("AppointmentDate").value),
