@@ -61,23 +61,29 @@
                     document.getElementById("VaccineType").value = vaccineData.vaccineType || "";
                     document.getElementById("Status").value = vaccineData.status || "pending";
 
-                    populateChildrenTextField(vaccineData.childId);
+                    populateChildrenDropdown(vaccineData.childId);
                 } else {
                     alert("Vaccine record not found.");
                 }
             }
         }
 
-        async function populateChildrenTextField(selectedChildId) {
-            const childRef = doc(db, "children", selectedChildId);
-            const childSnap = await getDoc(childRef);
+        async function populateChildrenDropdown(selectedChildId) {
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            const childSelect = document.getElementById("ChildName");
 
-            if (childSnap.exists()) {
-                const childData = childSnap.data();
-                document.getElementById("ChildName").value = childData.ChildName;
-            } else {
-                alert("Child record not found.");
-            }
+            childrenSnapshot.forEach((childDoc) => {
+                const childData = childDoc.data();
+                const option = document.createElement("option");
+                option.value = childDoc.id;
+                option.textContent = childData.ChildName;
+
+                if (childDoc.id === selectedChildId) {
+                    option.selected = true;
+                }
+
+                childSelect.appendChild(option);
+            });
         }
 
         const editVaccineForm = document.getElementById("editVaccineForm");
