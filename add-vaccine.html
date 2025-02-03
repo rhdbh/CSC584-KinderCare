@@ -8,7 +8,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Add Vaccine Record</h1>
+        <h1>Add Vaccine</h1>
 
         <form id="addVaccineForm">
             <label for="ChildName">Child Name</label>
@@ -28,8 +28,8 @@
             <label for="VaccineType">Vaccine Type</label>
             <input type="text" id="VaccineType" name="VaccineType" required>
 
-            <button type="submit" class="button">Add Vaccine Record</button>
-            <button type="button" class="button button-secondary" onclick="window.location.href='vaccine.html'">← Back to Vaccine Records</button>
+            <button type="submit" class="button">Add Vaccine</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='vaccine.html'">← Back to Vaccines</button>
         </form>
     </div>
 
@@ -48,44 +48,46 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
-        async function loadChildren() {
-            const childSelect = document.getElementById("ChildName");
-            const childrenSnapshot = await getDocs(collection(db, "children"));
 
-            childrenSnapshot.forEach((docSnap) => {
-                const childData = docSnap.data();
+        async function populateChildrenDropdown() {
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            const childSelect = document.getElementById("ChildName");
+
+            childrenSnapshot.forEach((childDoc) => {
+                const childData = childDoc.data();
                 const option = document.createElement("option");
-                option.value = docSnap.id; // childId as value
-                option.textContent = childData.ChildName || "Unknown";
+                option.value = childDoc.id;
+                option.textContent = childData.ChildName;
                 childSelect.appendChild(option);
             });
         }
 
-        loadChildren();
-        const addVaccineForm = document.getElementById('addVaccineForm');
-        addVaccineForm.addEventListener('submit', async (e) => {
+        const addVaccineForm = document.getElementById("addVaccineForm");
+        addVaccineForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const childName = document.getElementById("ChildName").value;
+            const selectedChildId = document.getElementById("ChildName").value;
             const status = document.getElementById("Status").value;
             const vaccineDate = document.getElementById("VaccineDate").value;
             const vaccineType = document.getElementById("VaccineType").value;
 
             try {
                 await addDoc(collection(db, "vaccine"), {
-                    childId: childName,
+                    childId: selectedChildId,
                     status: status,
                     vaccineDate: vaccineDate,
-                    vaccineType: vaccineType,
+                    vaccineType: vaccineType
                 });
 
-                alert("Vaccine record added successfully!");
+                alert("Vaccine added successfully.");
                 window.location.href = "vaccine.html";
             } catch (error) {
-                console.error("Error adding vaccine record:", error);
+                console.error("Error adding vaccine:", error);
+                alert("There was an error adding the vaccine.");
             }
         });
+
+        document.addEventListener("DOMContentLoaded", populateChildrenDropdown);
     </script>
 </body>
 </html>
