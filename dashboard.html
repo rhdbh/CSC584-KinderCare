@@ -32,7 +32,7 @@
     
     <!-- Main container -->
     <div class="container">
-        <h1>Welcome, <span id="username"></span>!</h1> <!-- Display the username -->
+        <h1>Welcome to KinderCare, <span id="userName"></span>!</h1> <!-- Display the username -->
 
         <!-- Dashboard content -->
 <div class="card-container">
@@ -69,7 +69,7 @@
     <script>
         // Get the username from sessionStorage (assuming it's set during login)
         const username = sessionStorage.getItem('userName');
-        if (userName) {
+        if (username) {
             document.getElementById('userName').textContent = username;
         } else {
             window.location.href = 'login.html'; // Redirect to login if not found
