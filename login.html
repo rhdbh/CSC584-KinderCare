@@ -27,25 +27,20 @@
             const email = document.getElementById("email").value;
             const password = document.getElementById("password").value;
 
-            // Clear previous error message
             document.getElementById("error-message").style.display = "none";
 
-            // Attempt login
             signInWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
                     console.log("Login successful:", user.email);
 
-                    // Store session info
                     sessionStorage.setItem("user_id", user.uid);
-                    sessionStorage.setItem("username", user.email);  // Store email as username
-                    window.location.href = "dashboard.html";  // Redirect to dashboard
+                    sessionStorage.setItem("username", user.userName);
+                    window.location.href = "dashboard.html";
                 })
                 .catch((error) => {
-                    // Log the error details for debugging
                     console.error("Login error:", error.code, error.message);
 
-                    // Display specific error message based on the error code
                     if (error.code === "auth/wrong-password") {
                         document.getElementById("error-message").textContent = "Incorrect password!";
                     } else if (error.code === "auth/user-not-found") {
