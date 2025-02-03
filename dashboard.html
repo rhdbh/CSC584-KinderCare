@@ -53,6 +53,10 @@
         <img class="card-img" src="img/milestone.png" alt="Milestone">
         <p><b>MILESTONE</b></p>
     </div>
+        <div class="card">
+        <img class="card-img" src="img/growth.png" alt="Growth">
+        <p><b>GROWTH</b></p>
+    </div>
 </div>
 
     </div>
@@ -60,9 +64,9 @@
     <!-- JavaScript to display the username dynamically -->
     <script>
         // Get the username from sessionStorage (assuming it's set during login)
-        const userName = sessionStorage.getItem('userName');
+        const username = sessionStorage.getItem('userName');
         if (userName) {
-            document.getElementById('userName').textContent = userName;
+            document.getElementById('userName').textContent = username;
         } else {
             window.location.href = 'login.html'; // Redirect to login if not found
         }
