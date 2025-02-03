@@ -21,10 +21,10 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- Vaccine records will be populated here -->
             </tbody>
         </table>
         <button class="button" onclick="window.location.href='add-vaccine.html'">Add Vaccine</button>
+        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
     </div>
 
     <script type="module">
@@ -45,13 +45,21 @@
 
         async function loadVaccineData() {
             const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            
+            const childrenMap = {};
+            // Map children data by their ID
+            childrenSnapshot.forEach((childDoc) => {
+                childrenMap[childDoc.id] = childDoc.data().ChildName;
+            });
+
             const vaccineTableBody = document.getElementById("vaccineTable").getElementsByTagName("tbody")[0];
 
             vaccineSnapshot.forEach((vaccineDoc) => {
                 const vaccineData = vaccineDoc.data();
                 const vaccineId = vaccineDoc.id;
+                const childName = childrenMap[vaccineData.ChildName] || "Unknown";  // Get the child name from the map
 
-                // Create a new row for each vaccine record
                 const row = vaccineTableBody.insertRow();
 
                 const cell1 = row.insertCell(0);
@@ -60,7 +68,7 @@
                 const cell4 = row.insertCell(3);
                 const cell5 = row.insertCell(4);
 
-                cell1.textContent = vaccineData.childName;
+                cell1.textContent = childName;
                 cell2.textContent = vaccineData.status;
                 cell3.textContent = vaccineData.vaccineDate;
                 cell4.textContent = vaccineData.vaccineType;
@@ -86,6 +94,11 @@
                 completeButton.onclick = function() {
                     updateVaccineStatus(vaccineId, "completed");
                 };
+
+                // Hide "Complete" button if status is "completed"
+                if (vaccineData.status === "completed") {
+                    completeButton.style.display = "none"; // Hide the button
+                }
 
                 cell5.appendChild(editButton);
                 cell5.appendChild(deleteButton);
