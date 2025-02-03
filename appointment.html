@@ -105,12 +105,15 @@
         async function loadAppointment() {
             const appointmentSnapshot = await getDocs(collection(db, "appointment"));
             const tableBody = document.querySelector("#appointmentTable tbody");
-            tableBody.innerHTML = ""; // Clear previous data
+            tableBody.innerHTML = "";
 
             appointmentSnapshot.forEach((appointmentDoc) => {
                 const appointment = appointmentDoc.data();
-                const appointmentDate = appointment.appointmentDate.toDate();
-                const appointmentDateString = appointmentDate.toDateString();
+                let appointmentDateString = "N/A";
+
+                if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
+                    appointmentDateString = appointment.appointmentDate.toDate().toDateString();
+                }
 
                 let actionButtons = `
                     <button class="button-primary" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
@@ -126,18 +129,24 @@
                 }
 
                 const row = document.createElement("tr");
-                if (Math.floor((appointmentDate - new Date()) / (1000 * 60 * 60 * 24)) <= 3) {
-                    row.style.backgroundColor = "#FFCCE5";
+
+                if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
+                    const appointmentDate = appointment.appointmentDate.toDate();
+                    const daysLeft = Math.floor((appointmentDate - new Date()) / (1000 * 60 * 60 * 24));
+
+                    if (daysLeft <= 3) {
+                        row.style.backgroundColor = "#FFCCE5";
+                    }
                 }
 
                 row.innerHTML = `
-                    <td>${appointment.childName}</td>
-                    <td>${appointment.appointmentType}</td>
-                    <td>${appointment.status}</td>
-                    <td>${appointment.healthcareProvider}</td>
+                    <td>${appointment.childName || "N/A"}</td>
+                    <td>${appointment.appointmentType || "N/A"}</td>
+                    <td>${appointment.status || "N/A"}</td>
+                    <td>${appointment.healthcareProvider || "N/A"}</td>
                     <td>${appointmentDateString}</td>
-                    <td>${appointment.appointmentTime}</td>
-                    <td>${appointment.remark}</td>
+                    <td>${appointment.appointmentTime || "N/A"}</td>
+                    <td>${appointment.remark || "N/A"}</td>
                     <td>${actionButtons}</td>
                 `;
 
@@ -167,7 +176,7 @@
                 try {
                     await deleteDoc(doc(db, "appointment", id));
                     alert("Appointment deleted successfully.");
-                    loadAppointment(); // Reload only the data instead of full page reload
+                    loadAppointment();
                 } catch (error) {
                     console.error("Error deleting appointment:", error);
                     alert("Error deleting appointment.");
@@ -177,10 +186,9 @@
 
         async function markAsCompleted(id) {
             try {
-                const appointmentRef = doc(db, "appointment", id);
-                await updateDoc(appointmentRef, { status: "Completed" });
+                await updateDoc(doc(db, "appointment", id), { status: "Completed" });
                 alert("Appointment marked as completed.");
-                loadAppointment(); // Reload data
+                loadAppointment();
             } catch (error) {
                 console.error("Error updating appointment:", error);
                 alert("Error updating appointment.");
@@ -189,10 +197,9 @@
 
         async function rescheduleAppointment(id) {
             try {
-                const appointmentRef = doc(db, "appointment", id);
-                await updateDoc(appointmentRef, { status: "Rescheduled" });
+                await updateDoc(doc(db, "appointment", id), { status: "Rescheduled" });
                 alert("Appointment rescheduled.");
-                loadAppointment(); // Reload data
+                loadAppointment();
             } catch (error) {
                 console.error("Error rescheduling appointment:", error);
                 alert("Error rescheduling appointment.");
