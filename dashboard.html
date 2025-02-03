@@ -16,14 +16,12 @@
         }
 
         .card-container {
-    display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Align vertically */
-    gap: 20px; /* Add space between cards */
-    flex-wrap: wrap; /* Allow wrapping if needed */
-}
-
-
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            align-items: center; /* Center the cards */
+            gap: 10px; /* Space between cards */
+            width: 100%; /* Ensure full width */
+        }
         .card-img {
             width: 80px; /* Adjust the width of the image */
             height: auto; /* Maintain aspect ratio */
