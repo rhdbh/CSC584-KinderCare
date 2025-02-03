@@ -5,7 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment List | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-    
+        <style>
+        .button-complete {
+            background-color: #28a745;
+            color: white;
+        }
+        .button-complete:hover {
+            background-color: #19692c;
+            color: white;
+        }
+        .button-reschedule {
+            background-color: #FF00FF;
+            color: white;
+        }
+        .button-reschedule :hover {
+            background-color: #BA55D3;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -59,21 +76,20 @@
                 }
 
                 let actionButtons = `
-                    <button class="button-primary" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
-                    <button class="button-danger" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
+                    <button class="button" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
+                    <button class="logout-button" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
                 `;
 
                 if (appointment.status === "Pending") {
-                    actionButtons += `<button class="button-primary" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>`;
+                    actionButtons += `<button class="button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
                 } else if (appointment.status === "Missed") {
-                    actionButtons += `<button class="button-primary" data-id="${appointmentDoc.id}" data-action="reschedule">Reschedule</button>`;
+                    actionButtons += `<button class="button-reschedule" data-id="${appointmentDoc.id}" data-action="Rescheduled">Reschedule</button>`;
                 } else if (appointment.status === "Rescheduled") {
-                    actionButtons += `<button class="button-primary" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>`;
+                    actionButtons += `<button class="button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
                 }
 
                 const row = document.createElement("tr");
 
-                // Tukar warna mengikut status
                 if (appointment.status === "Rescheduled") {
                     row.style.backgroundColor = "#FFF8DC";
                 } else if (appointment.status === "Completed") {
