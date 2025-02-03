@@ -8,7 +8,7 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
@@ -22,9 +22,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let allGrowthRecords = [];
         let childrenList = [];
 
+        // Load the list of children for the filter dropdown
         async function loadChildren() {
             const childSelect = document.getElementById("childSelect");
             const childrenSnapshot = await getDocs(collection(db, "children"));
@@ -36,6 +36,7 @@
                     id: childDoc.id,
                     name: childData.ChildName
                 });
+
                 const option = document.createElement("option");
                 option.value = childDoc.id;
                 option.textContent = childData.ChildName;
@@ -43,9 +44,10 @@
             });
         }
 
-        async function loadGrowthRecords(childName = "") {
+        // Load growth records, optionally filtered by child name
+        async function loadGrowthRecords(childId = "") {
             const growthTable = document.getElementById("growthTable");
-            growthTable.innerHTML = "";
+            growthTable.innerHTML = ""; // Clear previous records
 
             const growthSnapshot = await getDocs(collection(db, "growth"));
             const childrenMap = {};
@@ -61,51 +63,52 @@
                 const childData = childrenMap[growth.childId] || { ChildName: "Unknown" };
                 const childNameFromGrowth = childData.ChildName;
 
-                if (childName && childName !== childNameFromGrowth) {
-                    return;
+                // If no childId is selected or if the selected childId matches, display the record
+                if (childId === "" || growth.childId === childId) {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${childNameFromGrowth}</td>
+                        <td>${growth.age} month(s)</td>
+                        <td>${growth.height} cm</td>
+                        <td>${growth.weight} kg</td>
+                        <td>
+                            <button class="button" onclick="editGrowth('${growthId}')">Edit</button>
+                            <button class="button button-secondary" onclick="deleteGrowth('${growthId}')">Delete</button>
+                        </td>
+                    `;
+                    growthTable.appendChild(row);
                 }
-
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${childNameFromGrowth}</td>
-                    <td>${growth.age} month(s)</td>
-                    <td>${growth.height} cm</td>
-                    <td>${growth.weight} kg</td>
-                    <td>
-                        <button class="button" onclick="editGrowth('${growthId}')">Edit</button>
-                        <button class="button button-secondary" onclick="deleteGrowth('${growthId}')">Delete</button>
-                    </td>
-                `;
-                growthTable.appendChild(row);
-                allGrowthRecords.push(growth);
             });
         }
 
+        // Delete growth record
         async function deleteGrowth(growthId) {
             const confirmDelete = confirm("Are you sure you want to delete this record?");
             if (confirmDelete) {
                 try {
                     await deleteDoc(doc(db, "growth", growthId));
                     alert("Growth record deleted successfully.");
-                    loadGrowthRecords();
+                    loadGrowthRecords(); // Reload growth records after deletion
                 } catch (error) {
                     console.error("Error deleting record:", error);
                 }
             }
         }
 
+        // Edit growth record
         function editGrowth(growthId) {
             window.location.href = `edit-growth.html?id=${growthId}`;
         }
 
+        // Filter the records based on the selected child
         function filterGrowthRecords() {
-            const childName = document.getElementById("childSelect").value;
-            loadGrowthRecords(childName);
+            const selectedChildId = document.getElementById("childSelect").value;
+            loadGrowthRecords(selectedChildId);
         }
 
         document.addEventListener("DOMContentLoaded", () => {
             loadChildren();
-            loadGrowthRecords();
+            loadGrowthRecords(); // Initial load of all records
         });
 
         window.deleteGrowth = deleteGrowth;
@@ -115,11 +118,14 @@
 <body>
     <div class="container">
         <h1>Growth Records</h1>
-        
+
+        <!-- Dropdown to filter by child -->
         <label for="childSelect">Select Child:</label>
-        <select id="childSelect" onchange="filterGrowthRecords()">
+        <select id="childSelect">
             <option value="">-- All Children --</option>
+            <!-- Dynamic children options will be loaded here -->
         </select>
+        <button class="button" onclick="filterGrowthRecords()">Filter</button>
         <br><br>
 
         <table class="table">
