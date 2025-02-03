@@ -91,6 +91,113 @@ h1 {
     background-color: #cc3b3b;
 }
 
+.back-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+.vaccine-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.vaccine-table th, .vaccine-table td {
+    border: 1px solid #ddd;
+    text-align: center;
+    padding: 10px;
+}
+
+.vaccine-table th {
+    background-color: #007BFF;
+    color: white;
+}
+
+.vaccine-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+.vaccine-table tr:hover {
+     background-color: #f1f1f1;
+}
+
+.action-buttons {
+     display: flex;
+     justify-content: center;
+     gap: 10px;
+}
+
+.action-buttons button {
+     padding: 8px 12px;
+     border: none;
+     border-radius: 5px;
+     font-size: 14px;
+     cursor: pointer;
+     transition: background 0.3s ease;
+}
+
+.action-buttons .edit {
+     background-color: #ffc107;
+     color: white;
+}
+
+.action-buttons .edit:hover {
+     background-color: #e0a800;
+}
+
+.action-buttons .complete {
+     background-color: #28a745;
+     color: white;
+}
+
+.action-buttons .complete:hover {
+     background-color: #218838;
+}
+
+.action-buttons .delete {
+     background-color: #dc3545;
+     color: white;
+}
+
+.action-buttons .delete:hover {
+     background-color: #c82333;
+}
+
+.add-vaccine {
+     text-align: center;
+     margin: 20px 0;
+}
+
+.add-vaccine button {
+     background-color: #007BFF;
+     color: white;
+     padding: 10px 20px;
+     border: none;
+     border-radius: 5px;
+     font-size: 16px;
+     cursor: pointer;
+     transition: background 0.3s ease;
+}
+
+.add-vaccine button:hover {
+    background-color: #0056b3;
+}
+
+
 /* Form styles */
 form {
     display: flex;
