@@ -54,8 +54,6 @@
                 if (docSnap.exists()) {
                     const growthData = docSnap.data();
                     const childId = growthData.childId;
-
-                    // Fetch child name using childId
                     const childDocRef = doc(db, "children", childId);
                     getDoc(childDocRef).then((childDocSnap) => {
                         if (childDocSnap.exists()) {
@@ -65,8 +63,6 @@
                     }).catch((error) => {
                         console.error("Error fetching child data:", error);
                     });
-
-                    // Populate growth record data into the form
                     document.getElementById("Age").value = growthData.age || "";
                     document.getElementById("Height").value = growthData.height || "";
                     document.getElementById("Weight").value = growthData.weight || "";
@@ -85,7 +81,6 @@
             const updatedWeight = document.getElementById("Weight").value;
 
             try {
-                // Update the growth record with the new details
                 await updateDoc(doc(db, "growth", growthId), {
                     age: updatedAge,
                     height: updatedHeight,
@@ -93,7 +88,7 @@
                 });
 
                 alert("Growth record updated successfully!");
-                window.location.href = "growth.html"; // Redirect to the growth records page
+                window.location.href = "growth.html";
             } catch (error) {
                 console.error("Error updating growth record:", error);
             }
