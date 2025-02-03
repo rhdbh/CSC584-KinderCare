@@ -19,7 +19,7 @@ body, html {
     border-radius: 8px;
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width:900px; /* Adjusted for larger container needs */
+    max-width:800px; /* Adjusted for larger container needs */
     text-align: center;
     position: relative; /* Allow positioning of elements like logout button */
 }
