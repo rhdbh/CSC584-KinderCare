@@ -60,9 +60,9 @@
     <!-- JavaScript to display the username dynamically -->
     <script>
         // Get the username from sessionStorage (assuming it's set during login)
-        const username = sessionStorage.getItem('username');
-        if (username) {
-            document.getElementById('username').textContent = username;
+        const userName = sessionStorage.getItem('userName');
+        if (userName) {
+            document.getElementById('userName').textContent = userName;
         } else {
             window.location.href = 'login.html'; // Redirect to login if not found
         }
