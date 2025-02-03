@@ -90,7 +90,7 @@
             };
 
             try {
-                const appointmentRef = doc(collection(db, "appointments"));
+                const appointmentRef = doc(collection(db, "appointment"));
                 await setDoc(appointmentRef, newAppointment);
 
                 alert("Appointment added successfully.");
