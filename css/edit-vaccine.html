@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Vaccine | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Vaccine</h1>
+
+        <form id="editVaccineForm">
+            <label for="ChildName">Child Name</label>
+            <select id="ChildName" name="ChildName" required>
+            </select>
+
+            <label for="Status">Status</label>
+            <select id="Status" name="Status" required>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+            </select>
+
+            <label for="VaccineDate">Vaccine Date</label>
+            <input type="date" id="VaccineDate" name="VaccineDate" required>
+
+            <label for="VaccineType">Vaccine Type</label>
+            <input type="text" id="VaccineType" name="VaccineType" required>
+
+            <button type="submit" class="button">Update Vaccine</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='vaccine.html'">← Back to Vaccines</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const vaccineId = urlParams.get('id');
+
+        async function loadVaccineData() {
+            if (vaccineId) {
+                const vaccineRef = doc(db, "vaccine", vaccineId);
+                const vaccineSnap = await getDoc(vaccineRef);
+
+                if (vaccineSnap.exists()) {
+                    const vaccineData = vaccineSnap.data();
+                    document.getElementById("VaccineDate").value = vaccineData.vaccineDate || "";
+                    document.getElementById("VaccineType").value = vaccineData.vaccineType || "";
+                    document.getElementById("Status").value = vaccineData.status || "pending";
+
+                    populateChildrenDropdown(vaccineData.childId);
+                } else {
+                    alert("Vaccine record not found.");
+                }
+            }
+        }
+
+        async function populateChildrenDropdown(selectedChildId) {
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            const childSelect = document.getElementById("ChildName");
+
+            childrenSnapshot.forEach((childDoc) => {
+                const childData = childDoc.data();
+                const option = document.createElement("option");
+                option.value = childDoc.id;
+                option.textContent = childData.ChildName;
+
+                if (childDoc.id === selectedChildId) {
+                    option.selected = true;
+                }
+
+                childSelect.appendChild(option);
+            });
+        }
+
+        const editVaccineForm = document.getElementById("editVaccineForm");
+        editVaccineForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const updatedChildId = document.getElementById("ChildName").value;
+            const updatedStatus = document.getElementById("Status").value;
+            const updatedVaccineDate = document.getElementById("VaccineDate").value;
+            const updatedVaccineType = document.getElementById("VaccineType").value;
+
+            try {
+                const vaccineRef = doc(db, "vaccine", vaccineId);
+                await updateDoc(vaccineRef, {
+                    childId: updatedChildId,
+                    status: updatedStatus,
+                    vaccineDate: updatedVaccineDate,
+                    vaccineType: updatedVaccineType
+                });
+
+                alert("Vaccine updated successfully.");
+                window.location.href = "vaccine.html";
+            } catch (error) {
+                console.error("Error updating vaccine:", error);
+                alert("There was an error updating the vaccine record.");
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", loadVaccineData);
+    </script>
+</body>
+</html>
