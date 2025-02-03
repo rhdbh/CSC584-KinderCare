@@ -82,8 +82,6 @@
 
                 if (appointment.status === "Pending") {
                     actionButtons += `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
-                } else if (appointment.status === "Missed") {
-                    actionButtons += `<button class="button button-reschedule" data-id="${appointmentDoc.id}" data-action="Rescheduled">Reschedule</button>`;
                 } else if (appointment.status === "Rescheduled") {
                     actionButtons += `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
                 }
@@ -94,6 +92,8 @@
                     row.style.backgroundColor = "#FFF8DC";
                 } else if (appointment.status === "Completed") {
                     row.style.backgroundColor = "#DFFFD6";
+                } else if (appointment.status === "Missed") {
+                    row.style.backgroundColor = "#FF2400";
                 } else if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
                     const appointmentDate = appointment.appointmentDate.toDate();
                     const daysLeft = Math.floor((appointmentDate - new Date()) / (1000 * 60 * 60 * 24));
