@@ -10,11 +10,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 
     <script type="module">
-        // Import the necessary Firebase functions
+        // Import necessary Firebase functions
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // Your Firebase configuration
+        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
             authDomain: "kindercare-cd7da.firebaseapp.com",
@@ -27,26 +27,71 @@
 
         // Initialize Firebase and Firestore
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); // Firestore instance
+        const db = getFirestore(app);
 
-        // Function to load children from Firestore and populate the select dropdown
+        // Function to load children data from Firestore and populate the dropdown
         async function loadChildren() {
-            const childrenRef = collection(db, "children");  // Reference to children collection
-            const querySnapshot = await getDocs(childrenRef); // Fetch data from Firestore
-            const childSelect = document.getElementById('child'); // Get the select element
-            childSelect.innerHTML = '<option value="">Select children ID number</option>'; // Clear previous options
+            try {
+                const childrenRef = collection(db, "children");  
+                const querySnapshot = await getDocs(childrenRef);
+                const childSelect = document.getElementById('child');
+                childSelect.innerHTML = '<option value="">Select child</option>';
 
-            querySnapshot.forEach((doc) => {
-                const child = doc.data();
-                const option = document.createElement('option');
-                option.value = child.child_id; // Use child_id from Firestore
-                option.textContent = `Child ${child.child_id}`; // Display child ID
-                childSelect.appendChild(option); // Add the option to the select dropdown
-            });
+                if (querySnapshot.empty) {
+                    alert("No children records found.");
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const child = doc.data();
+                    const option = document.createElement('option');
+                    option.value = doc.id; // Storing the Firestore document ID as value
+                    option.textContent = child.ChildName; // Display the child name
+                    childSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading children data:", error);
+                alert("Error loading children data. Please try again later.");
+            }
         }
 
-        // Load children when the page loads
+        // Load children data when the page loads
         window.onload = loadChildren;
+
+        // Handle appointment form submission
+        async function handleAppointmentSubmit(event) {
+            event.preventDefault(); // Prevent form from reloading the page
+
+            const childId = document.getElementById('child').value; // Get the selected child's Firestore document ID
+            const appointmentType = document.querySelector('input[name="appointment"]:checked').value;
+            const healthcareProvider = document.getElementById('healthcare').value;
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+
+            if (!childId || !appointmentType || !healthcareProvider || !date || !time) {
+                alert("Please fill in all fields.");
+                return;
+            }
+
+            // Save the appointment data (example)
+            try {
+                const appointmentRef = collection(db, "appointments");
+                await addDoc(appointmentRef, {
+                    childId: childId, // Storing the Firestore document ID of the selected child
+                    appointmentType: appointmentType,
+                    healthcareProvider: healthcareProvider,
+                    date: date,
+                    time: time,
+                });
+                alert("Appointment booked successfully!");
+            } catch (error) {
+                console.error("Error booking appointment:", error);
+                alert("There was an error booking the appointment. Please try again.");
+            }
+        }
+
+        // Attach the form submit handler
+        document.getElementById('appointmentForm').addEventListener('submit', handleAppointmentSubmit);
     </script>
 
     <style>
@@ -94,15 +139,14 @@
 </head>
 <body>
 
-    <!-- Appointment Form -->
     <div class="container">
         <h1>Book Appointment | KinderCare</h1>
         <p>Please fill in the details below to book an appointment.</p>
 
         <form id="appointmentForm">
-            <label for="child">Children ID Number:</label>
+            <label for="child">Child's Name:</label>
             <select id="child" name="child" required>
-                <option value="">Select children ID number</option>
+                <option value="">Select child</option>
                 <!-- Children options will be dynamically populated here -->
             </select>
 
