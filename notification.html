@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upcoming Appointment Notifications</title>
+    <style>
+        /* Bell Icon */
+        #bell-icon {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 30px;
+            cursor: pointer;
+            background-color: #f0f0f0;
+            border-radius: 50%;
+            padding: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Notification Panel */
+        #notification-panel {
+            position: fixed;
+            bottom: 70px;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+            border-radius: 8px;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        #notification-panel h3 {
+            margin: 0;
+            padding-bottom: 10px;
+            font-size: 18px;
+        }
+
+        #notification-panel ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #notification-panel li {
+            padding: 8px;
+            background-color: #f9f9f9;
+            margin: 5px 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #notification-panel li:hover {
+            background-color: #e9e9e9;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+</head>
+<body>
+
+    <!-- Bell Icon -->
+    <div id="bell-icon" title="Upcoming Appointments">🔔</div>
+
+    <!-- Notification Panel -->
+    <div id="notification-panel">
+        <h3>Upcoming Appointments</h3>
+        <ul id="appointments-list"></ul>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore(app);
+
+        // Fetch appointments from Firestore and display upcoming ones
+        async function getAppointments() {
+            const appointmentsRef = db.collection("appointments"); // Replace with your Firestore collection name
+            const snapshot = await appointmentsRef.get();
+            const currentDate = new Date();
+            const appointmentsList = document.getElementById('appointments-list');
+            appointmentsList.innerHTML = ""; // Clear previous list
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const appointmentDate = new Date(data.date);
+                const timeDiff = appointmentDate - currentDate;
+
+                // Show appointment if it's within the next 24 hours
+                if (timeDiff <= 24 * 60 * 60 * 1000 && timeDiff >= 0) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Appointment with ${data.name} on ${appointmentDate.toLocaleString()}`;
+                    appointmentsList.appendChild(listItem);
+                }
+            });
+        }
+
+        // Toggle Notification Panel visibility
+        function toggleNotificationPanel() {
+            const panel = document.getElementById('notification-panel');
+            if (panel.style.display === "none" || panel.style.display === "") {
+                panel.style.display = "block";
+                getAppointments(); // Load appointments when the panel is opened
+            } else {
+                panel.style.display = "none";
+            }
+        }
+
+        // Attach click event to bell icon
+        document.getElementById('bell-icon').addEventListener('click', toggleNotificationPanel);
+
+        // Close the panel if clicked outside of it
+        window.addEventListener('click', function(event) {
+            const panel = document.getElementById('notification-panel');
+            const bellIcon = document.getElementById('bell-icon');
+            if (!panel.contains(event.target) && event.target !== bellIcon) {
+                panel.style.display = "none";
+            }
+        });
+    </script>
+
+</body>
+</html>
