@@ -35,26 +35,32 @@
             padding: 8px 12px;
             margin: 5px;
             cursor: pointer;
+            border: none;
+            color: white;
         }
 
-        .button {
+        .button-primary {
             background-color: #007BFF;
-            color: white;
-            border: none;
         }
 
         .button-secondary {
             background-color: #6c757d;
-            color: white;
-            border: none;
         }
 
-        .button:hover {
+        .button-danger {
+            background-color: #dc3545;
+        }
+
+        .button-primary:hover {
             background-color: #0056b3;
         }
 
         .button-secondary:hover {
             background-color: #5a6268;
+        }
+
+        .button-danger:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
@@ -76,8 +82,8 @@
             </thead>
             <tbody></tbody>
         </table>
-        <button onclick="window.location.href='add-appointment.html'" class="button">Add Appointment</button>
-        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+        <button onclick="window.location.href='add-appointment.html'" class="button-primary">Add Appointment</button>
+        <button class="button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
     </div>
 
     <script type="module">
@@ -99,6 +105,7 @@
         async function loadAppointment() {
             const appointmentSnapshot = await getDocs(collection(db, "appointment"));
             const tableBody = document.querySelector("#appointmentTable tbody");
+            tableBody.innerHTML = ""; // Clear previous data
 
             appointmentSnapshot.forEach((appointmentDoc) => {
                 const appointment = appointmentDoc.data();
@@ -106,25 +113,16 @@
                 const appointmentDateString = appointmentDate.toDateString();
 
                 let actionButtons = `
-                    <button onclick="editAppointment('${appointmentDoc.id}')">Edit</button>
-                    <button onclick="deleteAppointment('${appointmentDoc.id}')">Delete</button>
+                    <button class="button-primary" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
+                    <button class="button-danger" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
                 `;
 
                 if (appointment.status === "Pending") {
-                    actionButtons = `
-                        ${actionButtons}
-                        <button onclick="markAsCompleted('${appointmentDoc.id}')">Completed</button>
-                    `;
+                    actionButtons += `<button class="button-primary" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>`;
                 } else if (appointment.status === "Missed") {
-                    actionButtons = `
-                        ${actionButtons}
-                        <button onclick="rescheduleAppointment('${appointmentDoc.id}')">Reschedule</button>
-                    `;
+                    actionButtons += `<button class="button-primary" data-id="${appointmentDoc.id}" data-action="reschedule">Reschedule</button>`;
                 } else if (appointment.status === "Rescheduled") {
-                    actionButtons = `
-                        ${actionButtons}
-                        <button onclick="markAsCompleted('${appointmentDoc.id}')">Completed</button>
-                    `;
+                    actionButtons += `<button class="button-primary" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>`;
                 }
 
                 const row = document.createElement("tr");
@@ -142,30 +140,63 @@
                     <td>${appointment.remark}</td>
                     <td>${actionButtons}</td>
                 `;
+
                 tableBody.appendChild(row);
+            });
+
+            document.querySelectorAll("button[data-id]").forEach(button => {
+                button.addEventListener("click", async (event) => {
+                    const id = event.target.getAttribute("data-id");
+                    const action = event.target.getAttribute("data-action");
+
+                    if (action === "edit") {
+                        editAppointment(id);
+                    } else if (action === "delete") {
+                        await deleteAppointment(id);
+                    } else if (action === "complete") {
+                        await markAsCompleted(id);
+                    } else if (action === "reschedule") {
+                        await rescheduleAppointment(id);
+                    }
+                });
             });
         }
 
         async function deleteAppointment(id) {
             if (confirm("Are you sure you want to delete this appointment?")) {
-                await deleteDoc(doc(db, "appointment", id));
-                alert("Appointment deleted successfully.");
-                window.location.reload();
+                try {
+                    await deleteDoc(doc(db, "appointment", id));
+                    alert("Appointment deleted successfully.");
+                    loadAppointment(); // Reload only the data instead of full page reload
+                } catch (error) {
+                    console.error("Error deleting appointment:", error);
+                    alert("Error deleting appointment.");
+                }
             }
         }
 
         async function markAsCompleted(id) {
-            const appointmentRef = doc(db, "appointment", id);
-            await updateDoc(appointmentRef, { status: "Completed" });
-            alert("Appointment marked as completed.");
-            window.location.reload();
+            try {
+                const appointmentRef = doc(db, "appointment", id);
+                await updateDoc(appointmentRef, { status: "Completed" });
+                alert("Appointment marked as completed.");
+                loadAppointment(); // Reload data
+            } catch (error) {
+                console.error("Error updating appointment:", error);
+                alert("Error updating appointment.");
+            }
         }
 
         async function rescheduleAppointment(id) {
-            const appointmentRef = doc(db, "appointment", id);
-            await updateDoc(appointmentRef, { status: "Rescheduled" });
-            alert("Appointment rescheduled.");
-            window.location.reload();
+            try {
+                const appointmentRef = doc(db, "appointment", id);
+                await updateDoc(appointmentRef, { status: "Rescheduled" });
+                alert("Appointment rescheduled.");
+                loadAppointment(); // Reload data
+            } catch (error) {
+                console.error("Error rescheduling appointment:", error);
+                alert("Error rescheduling appointment.");
+            }
         }
 
         function editAppointment(id) {
