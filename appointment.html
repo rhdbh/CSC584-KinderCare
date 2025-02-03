@@ -43,7 +43,7 @@
             <tbody></tbody>
         </table>
         <button onclick="window.location.href='add-appointment.html'" class="button-primary">Add Appointment</button>
-        <button class="button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
     </div>
 
     <script type="module">
@@ -77,15 +77,15 @@
 
                 let actionButtons = `
                     <button class="button" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
-                    <button class="button-secondary" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
+                    <button class="button button-secondary" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
                 `;
 
                 if (appointment.status === "Pending") {
-                    actionButtons += `<button class="button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
+                    actionButtons += `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
                 } else if (appointment.status === "Missed") {
-                    actionButtons += `<button class="button-reschedule" data-id="${appointmentDoc.id}" data-action="Rescheduled">Reschedule</button>`;
+                    actionButtons += `<button class="button button-reschedule" data-id="${appointmentDoc.id}" data-action="Rescheduled">Reschedule</button>`;
                 } else if (appointment.status === "Rescheduled") {
-                    actionButtons += `<button class="button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
+                    actionButtons += `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="Completed">Completed</button>`;
                 }
 
                 const row = document.createElement("tr");
