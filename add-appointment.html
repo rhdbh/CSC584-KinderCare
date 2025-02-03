@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Appointment | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Add Appointment</h1>
+
+        <form id="addAppointmentForm">
+            <label for="ChildName">Child Name</label>
+            <select id="ChildName" name="ChildName" required>
+                <option value="" disabled selected>Select Child</option>
+            </select>
+
+            <label for="AppointmentType">Appointment Type</label>
+            <select id="AppointmentType" name="AppointmentType" required>
+                <option value="vaccine">Vaccine</option>
+                <option value="checkup">Checkup</option>
+            </select>
+
+            <label for="HealthcareProvider">Healthcare Provider</label>
+            <input type="text" id="HealthcareProvider" name="HealthcareProvider" required>
+
+            <label for="AppointmentDate">Appointment Date</label>
+            <input type="date" id="AppointmentDate" name="AppointmentDate" required>
+
+            <label for="AppointmentTime">Appointment Time</label>
+            <input type="time" id="AppointmentTime" name="AppointmentTime" required>
+
+            <label for="Status">Status</label>
+            <select id="Status" name="Status" required>
+                <option value="completed">Completed</option>
+                <option value="missed">Missed</option>
+            </select>
+
+            <label for="Remark">Remark</label>
+            <textarea id="Remark" name="Remark"></textarea>
+
+            <button type="submit" class="button">Add Appointment</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='appointment.html'">← Back</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function populateChildrenDropdown() {
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            const childSelect = document.getElementById("ChildName");
+
+            childrenSnapshot.forEach((childDoc) => {
+                const childData = childDoc.data();
+                const option = document.createElement("option");
+                option.value = childDoc.id;
+                option.textContent = childData.ChildName;
+                childSelect.appendChild(option);
+            });
+        }
+
+        const addAppointmentForm = document.getElementById("addAppointmentForm");
+        addAppointmentForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const newAppointment = {
+                childName: document.getElementById("ChildName").value,
+                appointmentType: document.getElementById("AppointmentType").value,
+                healthcareProvider: document.getElementById("HealthcareProvider").value,
+                appointmentDate: new Date(document.getElementById("AppointmentDate").value),
+                appointmentTime: document.getElementById("AppointmentTime").value,
+                status: document.getElementById("Status").value,
+                remark: document.getElementById("Remark").value
+            };
+
+            try {
+                const appointmentRef = doc(collection(db, "appointments"));
+                await setDoc(appointmentRef, newAppointment);
+
+                alert("Appointment added successfully.");
+                window.location.href = "appointment.html";
+            } catch (error) {
+                console.error("Error adding appointment:", error);
+                alert("There was an error adding the appointment.");
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", populateChildrenDropdown);
+    </script>
+</body>
+</html>
