@@ -19,7 +19,7 @@ body, html {
     border-radius: 8px;
     box-shadow: 0 5px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
-    max-width: 1200px; /* Adjusted for larger container needs */
+    max-width: 1000px; /* Adjusted for larger container needs */
     text-align: center;
     position: relative; /* Allow positioning of elements like logout button */
 }
@@ -29,7 +29,7 @@ body, html {
     flex-direction: row; /* Ensures cards are in a row */
     justify-content: center; /* Centers horizontally */
     align-items: center; /* Aligns items vertically */
-    gap: 20px; /* Space between cards */
+    gap: 10px; /* Space between cards */
     flex-wrap: wrap; /* Allows wrapping if screen is small */
     width: 100%; /* Ensures it takes full width */
     padding: 20px;
