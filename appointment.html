@@ -113,7 +113,7 @@
                 if (appointment.status === "Pending") {
                     actionButtons = `
                         ${actionButtons}
-                        <button onclick="markAsCompleted('${appointmentDoc.id}')">Mark as Completed</button>
+                        <button onclick="markAsCompleted('${appointmentDoc.id}')">Completed</button>
                     `;
                 } else if (appointment.status === "Missed") {
                     actionButtons = `
@@ -123,7 +123,7 @@
                 } else if (appointment.status === "Rescheduled") {
                     actionButtons = `
                         ${actionButtons}
-                        <button onclick="markAsCompleted('${appointmentDoc.id}')">Mark as Completed</button>
+                        <button onclick="markAsCompleted('${appointmentDoc.id}')">Completed</button>
                     `;
                 }
 
