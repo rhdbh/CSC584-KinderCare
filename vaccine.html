@@ -7,13 +7,13 @@
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .button-complete {
-     background-color: #28a745;
-     color: white;
+            background-color: #28a745;
+            color: white;
         }
-.button-complete:hover {
-     background-color: #19692c;
-     color: white;
-}
+        .button-complete:hover {
+            background-color: #19692c;
+            color: white;
+        }
     </style>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -38,6 +38,8 @@
             const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
             const childrenSnapshot = await getDocs(collection(db, "children"));
             const childrenMap = {};
+
+            // Create a map of childId -> ChildName
             childrenSnapshot.forEach((childDoc) => {
                 childrenMap[childDoc.id] = childDoc.data().ChildName;
             });
@@ -56,7 +58,7 @@
                     <td>
                         <button class="button" onclick="editVaccine('${vaccineId}')">Edit</button>
                         <button class="button button-secondary" onclick="deleteVaccine('${vaccineId}')">Delete</button>
-                        <button class="button button-success" onclick="completeVaccine('${vaccineId}')" ${vaccine.status === 'completed' ? 'style="display:none"' : ''}>Complete</button>
+                        <button class="button button-complete" onclick="completeVaccine('${vaccineId}')" ${vaccine.status === 'completed' ? 'style="display:none"' : ''}>Complete</button>
                     </td>
                 `;
                 vaccineTable.appendChild(row);
