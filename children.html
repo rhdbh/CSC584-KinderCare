@@ -52,7 +52,6 @@
 <body>
     <div class="container">
         <h1>My Beloved Children</h1>
-        <p><strong>Logged-in as:</strong> <span id="userName"></span></p>
         
         <table id="childrenTableContainer" style="display: none;">
             <thead>
@@ -76,15 +75,14 @@
     </div>
 
     <script>
-        // ✅ Step 1: Firebase Configuration (Replace with your Firebase credentials)
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+const firebaseConfig = {
+  apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+  authDomain: "kindercare-cd7da.firebaseapp.com",
+  projectId: "kindercare-cd7da",
+  storageBucket: "kindercare-cd7da.firebasestorage.app",
+  messagingSenderId: "930908122510",
+  appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+};
 
         // ✅ Step 2: Initialize Firebase
         firebase.initializeApp(firebaseConfig);
