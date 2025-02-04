@@ -45,18 +45,19 @@
             const growthQuery = query(collection(db, "growth"), where("childId", "==", childId));
             const growthSnapshot = await getDocs(growthQuery);
 
-            const ages = [];
-            const heights = [];
+            const growthData = [];
 
             growthSnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                ages.push(data.age);
-                heights.push(data.height);
+                growthData.push({ age: data.age, height: data.height });
             });
 
-            if (ages.length > 0) {
-                ages.sort((a, b) => a - b);
-                createHeightChart(ages, heights);
+            if (growthData.length > 0) {
+                growthData.sort((a, b) => a.age - b.age);
+                const sortedAges = growthData.map(item => item.age);
+                const sortedHeights = growthData.map(item => item.height);
+
+                createHeightChart(sortedAges, sortedHeights);
             } else {
                 alert("No growth records found for the selected child.");
             }
@@ -113,7 +114,7 @@
         <button type="button" class="button" onclick="displayHeightGraph()">Show Height Data</button>
 
         <div>
-            <canvas id="heightChart" width="500" height="200"></canvas>
+            <canvas id="heightChart" width="500" height="100"></canvas>
         </div>
         <br><br>
         <button class="button button-primary" onclick="window.location.href='growth-graph.html'">← Back to Growth Dashboard</button>
