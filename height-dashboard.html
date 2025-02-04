@@ -37,6 +37,7 @@
 
         async function displayHeightGraph() {
             const childId = document.getElementById("childSelect").value;
+            console.log("Child ID:", childId);
 
             if (!childId) {
                 alert("Please select a child.");
@@ -61,8 +62,11 @@
                 const sortedAges = filteredGrowthData.map(item => item.age);
                 const sortedHeights = filteredGrowthData.map(item => item.height);
 
+                console.log("Sorted Ages:", sortedAges);
+                console.log("Sorted Heights:", sortedHeights);
+
                 if (heightChartInstance) {
-                    heightChartInstance.destroy();
+                    heightChartInstance.destroy(); // Destroy the existing chart instance
                 }
                 createHeightChart(sortedAges, sortedHeights);
             } else {
@@ -110,6 +114,7 @@
         document.addEventListener("DOMContentLoaded", () => {
             loadChildren();
             document.getElementById("childSelect").addEventListener("change", () => {
+                // Clear the existing chart before generating a new one
                 if (heightChartInstance) {
                     heightChartInstance.destroy();
                 }
