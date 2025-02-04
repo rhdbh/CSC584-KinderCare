@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Dashboard | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to load children in the dropdown
+        async function loadChildren() {
+            const childrenDropdown = document.getElementById("childSelect");
+
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenSnapshot.forEach((docSnap) => {
+                const childData = docSnap.data();
+                const option = document.createElement("option");
+                option.value = docSnap.id;
+                option.textContent = childData.ChildName;
+                childrenDropdown.appendChild(option);
+            });
+        }
+
+        // Function to fetch and display growth data for the selected child
+        async function displayGraphs() {
+            const childId = document.getElementById("childSelect").value;
+
+            if (!childId) {
+                alert("Please select a child.");
+                return;
+            }
+
+            const growthQuery = query(collection(db, "growth"), where("childId", "==", childId));
+            const growthSnapshot = await getDocs(growthQuery);
+
+            const ages = [];
+            const heights = [];
+            const weights = [];
+
+            growthSnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                ages.push(data.age);
+                heights.push(data.height);
+                weights.push(data.weight);
+            });
+
+            if (ages.length > 0) {
+                createChart('heightChart', ages, heights, 'Age (Months)', 'Height (cm)');
+                createChart('weightChart', ages, weights, 'Age (Months)', 'Weight (kg)');
+            } else {
+                alert("No growth records found for the selected child.");
+            }
+        }
+
+        // Function to create the chart
+        function createChart(canvasId, xData, yData, xLabel, yLabel) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xData, // X-axis values (Age in months)
+                    datasets: [{
+                        label: yLabel,
+                        data: yData, // Y-axis values (Height/Weight)
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: xLabel
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: yLabel
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadChildren();
+            document.getElementById("childSelect").addEventListener("change", displayGraphs);
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Growth Dashboard</h1>
+        <label for="childSelect">Select Child:</label>
+        <select id="childSelect" required>
+            <option value="">-- Select Child --</option>
+        </select>
+        <br><br>
+        <button type="button" class="button" onclick="displayGraphs()">Show Growth Data</button>
+
+        <div>
+            <h2>Height vs. Age</h2>
+            <canvas id="heightChart" width="400" height="200"></canvas>
+        </div>
+
+        <div>
+            <h2>Weight vs. Age</h2>
+            <canvas id="weightChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</body>
+</html>
