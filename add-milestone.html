@@ -78,4 +78,21 @@
             const newMilestone = {
                 childId: selectedChildId,
                 dateAchieved: document.getElementById("dateAchieved").value,
-                mi
+                milestoneType: document.getElementById("milestoneType").value,
+                remark: document.getElementById("remark").value || ""
+            };
+
+            try {
+                const milestoneRef = doc(collection(db, "milestones"));
+                await setDoc(milestoneRef, newMilestone);
+
+                alert("Milestone added successfully.");
+                window.location.href = "milestone.html";
+            } catch (error) {
+                console.error("Error adding milestone:", error);
+                alert("There was an error adding the milestone.");
+            }
+        });
+    </script>
+</body>
+</html>
