@@ -3,57 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment List | KinderCare</title>
+    <title>Vaccine Records | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-    
     <style>
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-
-.table th, .table td {
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 10px;
-}
-
-.table th {
-    background-color: #007BFF;
-    color: white;
-}
-
-.table tr:hover {
-     background-color: #f1f1f1;
-}
-        
-        .button {
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            margin: 5px;
-        }
-
-        .button-primary {
-            background-color: #007bff;
-            color: white;
-        }
-        .button-primary:hover {
-            background-color: #0056b3;
-            color: white;
-        }
-
-        .button-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        .button-secondary:hover {
-            background-color: #5a6268;
-            color: white;
-        }
-
         .button-complete {
             background-color: #28a745;
             color: white;
@@ -62,42 +14,10 @@
             background-color: #19692c;
             color: white;
         }
-
-        .button-reschedule {
-            background-color: #FF00FF;
-            color: white;
-        }
-        .button-reschedule:hover {
-            background-color: #BA55D3;
-            color: white;
-        }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Appointment List</h1>
-        <table class="table" id="appointmentTable">
-            <thead>
-                <tr>
-                    <th>Child Name</th>
-                    <th>Type</th>
-                    <th>Status</th>
-                    <th>Location</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Remark</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table><br>
-        <button class="button button-primary" onclick="window.location.href='add-appointment.html'">+ Add Appointment</button>
-        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
@@ -111,104 +31,103 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        async function loadAppointment() {
-            const appointmentSnapshot = await getDocs(collection(db, "appointment"));
-            const tableBody = document.querySelector("#appointmentTable tbody");
-            tableBody.innerHTML = "";
+        async function loadVaccineRecords() {
+            const vaccineTable = document.getElementById("vaccineTable");
+            vaccineTable.innerHTML = "";
 
-            appointmentSnapshot.forEach((appointmentDoc) => {
-                const appointment = appointmentDoc.data();
-                let appointmentDateString = "N/A";
+            const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            const childrenMap = {};
 
-                if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
-                    appointmentDateString = appointment.appointmentDate.toDate().toDateString();
-                }
+            childrenSnapshot.forEach((childDoc) => {
+                childrenMap[childDoc.id] = childDoc.data().ChildName;
+            });
 
-                let actionButtons = `
-                    <button class="button" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
-                    <button class="button button-secondary" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
-                `;
+            if (vaccineSnapshot.empty) {
+                vaccineTable.innerHTML = `<tr><td colspan="5" style="text-align: center;">No vaccination record found.</td></tr>`;
+                return;
+            }
 
-                if (appointment.status === "Pending" || appointment.status === "Rescheduled") {
-                    actionButtons += `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>`;
-                }
+            vaccineSnapshot.forEach((docSnap) => {
+                const vaccine = docSnap.data();
+                const vaccineId = docSnap.id;
+                const childName = childrenMap[vaccine.childId] || "Unknown";
 
                 const row = document.createElement("tr");
 
-                if (appointment.status === "Rescheduled") {
-                    row.style.backgroundColor = "#FFF8DC";
-                } else if (appointment.status === "Completed") {
-                    row.style.backgroundColor = "#DFFFD6";
-                } else if (appointment.status === "Missed") {
-                    row.style.backgroundColor = "#FF2400";
-                } else if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
-                    const appointmentDate = appointment.appointmentDate.toDate();
-                    const daysLeft = Math.floor((appointmentDate - new Date()) / (1000 * 60 * 60 * 24));
-
-                    if (daysLeft <= 3) {
-                        row.style.backgroundColor = "#FFCCE5";
-                    }
+                if (vaccine.status === 'Completed') {
+                    row.style.backgroundColor = '#d4edda';
                 }
 
                 row.innerHTML = `
-                    <td>${appointment.childName || "N/A"}</td>
-                    <td>${appointment.appointmentType || "N/A"}</td>
-                    <td>${appointment.status || "N/A"}</td>
-                    <td>${appointment.healthcareProvider || "N/A"}</td>
-                    <td>${appointmentDateString}</td>
-                    <td>${appointment.appointmentTime || "N/A"}</td>
-                    <td>${appointment.remark || "N/A"}</td>
-                    <td>${actionButtons}</td>
+                    <td>${childName}</td>
+                    <td>${vaccine.status}</td>
+                    <td>${vaccine.vaccineDate}</td>
+                    <td>${vaccine.vaccineType}</td>
+                    <td>
+                        <button class="button" onclick="editVaccine('${vaccineId}')">Edit</button>
+                        <button class="button button-secondary" onclick="deleteVaccine('${vaccineId}')">Delete</button>
+                        <button class="button button-complete" onclick="completeVaccine('${vaccineId}')" ${vaccine.status === 'Completed' ? 'style="display:none"' : ''}>Complete</button>
+                    </td>
                 `;
-
-                tableBody.appendChild(row);
-            });
-
-            document.querySelectorAll("button[data-id]").forEach(button => {
-                button.addEventListener("click", async (event) => {
-                    const id = event.target.getAttribute("data-id");
-                    const action = event.target.getAttribute("data-action");
-
-                    if (action === "edit") {
-                        editAppointment(id);
-                    } else if (action === "delete") {
-                        await deleteAppointment(id);
-                    } else if (action === "complete") {
-                        await markAsCompleted(id);
-                    }
-                });
+                vaccineTable.appendChild(row);
             });
         }
 
-        async function deleteAppointment(id) {
-            if (confirm("Are you sure you want to delete this appointment?")) {
+        async function deleteVaccine(vaccineId) {
+            const confirmDelete = confirm("Are you sure you want to delete this record?");
+            if (confirmDelete) {
                 try {
-                    await deleteDoc(doc(db, "appointment", id));
-                    alert("Appointment deleted successfully.");
-                    loadAppointment();
+                    await deleteDoc(doc(db, "vaccine", vaccineId));
+                    alert("Vaccine record deleted successfully.");
+                    loadVaccineRecords();
                 } catch (error) {
-                    console.error("Error deleting appointment:", error);
-                    alert("Error deleting appointment.");
+                    console.error("Error deleting record:", error);
                 }
             }
         }
-
-        async function markAsCompleted(id) {
+        
+        async function completeVaccine(vaccineId) {
             try {
-                await updateDoc(doc(db, "appointment", id), { status: "Completed" });
-                alert("Appointment marked as completed.");
-                loadAppointment();
+                await updateDoc(doc(db, "vaccine", vaccineId), {
+                    status: "Completed"
+                });
+                loadVaccineRecords();
             } catch (error) {
-                console.error("Error updating appointment:", error);
-                alert("Error updating appointment.");
+                console.error("Error updating vaccine status:", error);
             }
         }
 
-        function editAppointment(id) {
-            window.location.href = `edit-appointment.html?id=${id}`;
+        function editVaccine(vaccineId) {
+            window.location.href = `edit-vaccine.html?id=${vaccineId}`;
         }
 
-        document.addEventListener("DOMContentLoaded", loadAppointment);
+        document.addEventListener("DOMContentLoaded", loadVaccineRecords);
+        window.deleteVaccine = deleteVaccine;
+        window.editVaccine = editVaccine;
+        window.completeVaccine = completeVaccine;
     </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Vaccine Records</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Child Name</th>
+                    <th>Status</th>
+                    <th>Vaccine Date</th>
+                    <th>Vaccine Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="vaccineTable">
+                <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+            </tbody>
+        </table>
+        <br>
+        <button class="button" onclick="window.location.href='add-vaccine.html'">+ Add Vaccine</button>
+        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+    </div>
 </body>
 </html>
