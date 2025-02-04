@@ -50,52 +50,62 @@
             const tableBody = document.getElementById("milestoneTableBody");
             tableBody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
 
-            const milestonesSnapshot = await getDocs(collection(db, "milestone"));
-            tableBody.innerHTML = "";
+            try {
+                const milestonesSnapshot = await getDocs(collection(db, "milestone"));
+                tableBody.innerHTML = "";
 
-            if (milestonesSnapshot.empty) {
-                tableBody.innerHTML = "<tr><td colspan='5'>No milestones found.</td></tr>";
-                return;
-            }
+                if (milestonesSnapshot.empty) {
+                    tableBody.innerHTML = "<tr><td colspan='5'>No milestones found.</td></tr>";
+                    return;
+                }
 
-            for (const milestoneDoc of milestonesSnapshot.docs) {
-                const milestoneData = milestoneDoc.data();
-                const childId = milestoneData.childId;
+                milestonesSnapshot.forEach(async (milestoneDoc) => {
+                    const milestoneData = milestoneDoc.data();
+                    const childId = milestoneData.childId;
+                    let childName = "Unknown";
 
-                const childSnapshot = await getDoc(doc(db, "children", childId));
-                const childName = childSnapshot.exists() ? childSnapshot.data().ChildName : "Unknown";
-
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${childName}</td>
-                    <td>${milestoneData.dateAchieved}</td>
-                    <td>${milestoneData.milestoneType}</td>
-                    <td>${milestoneData.remark || "—"}</td>
-                    <td>
-                        <button class="button edit-button" data-id="${milestoneDoc.id}">Edit</button>
-                        <button class="button button-secondary delete-button" data-id="${milestoneDoc.id}">Delete</button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            }
-
-            document.querySelectorAll(".edit-button").forEach(button => {
-                button.addEventListener("click", (event) => {
-                    const milestoneId = event.target.getAttribute("data-id");
-                    window.location.href = `edit-milestone.html?milestoneId=${milestoneId}`;
-                });
-            });
-
-            document.querySelectorAll(".delete-button").forEach(button => {
-                button.addEventListener("click", async (event) => {
-                    const milestoneId = event.target.getAttribute("data-id");
-                    if (confirm("Are you sure you want to delete this milestone?")) {
-                        await deleteDoc(doc(db, "milestone", milestoneId));
-                        alert("Milestone deleted successfully.");
-                        loadMilestones(); 
+                    if (childId) {
+                        const childSnapshot = await getDoc(doc(db, "children", childId));
+                        if (childSnapshot.exists()) {
+                            childName = childSnapshot.data().ChildName;
+                        }
                     }
+
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${childName}</td>
+                        <td>${milestoneData.dateAchieved || "N/A"}</td>
+                        <td>${milestoneData.milestoneType || "N/A"}</td>
+                        <td>${milestoneData.remark || "—"}</td>
+                        <td>
+                            <button class="button edit-button" data-id="${milestoneDoc.id}">Edit</button>
+                            <button class="button button-secondary delete-button" data-id="${milestoneDoc.id}">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
                 });
-            });
+
+                document.querySelectorAll(".edit-button").forEach(button => {
+                    button.addEventListener("click", (event) => {
+                        const milestoneId = event.target.getAttribute("data-id");
+                        window.location.href = `edit-milestone.html?milestoneId=${milestoneId}`;
+                    });
+                });
+
+                document.querySelectorAll(".delete-button").forEach(button => {
+                    button.addEventListener("click", async (event) => {
+                        const milestoneId = event.target.getAttribute("data-id");
+                        if (confirm("Are you sure you want to delete this milestone?")) {
+                            await deleteDoc(doc(db, "milestone", milestoneId));
+                            alert("Milestone deleted successfully.");
+                            loadMilestones();
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error("Error fetching milestones:", error);
+                tableBody.innerHTML = "<tr><td colspan='5'>Error loading milestones.</td></tr>";
+            }
         }
 
         document.addEventListener("DOMContentLoaded", loadMilestones);
