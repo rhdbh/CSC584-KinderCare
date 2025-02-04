@@ -24,7 +24,6 @@
 
         async function loadChildren() {
             const childrenDropdown = document.getElementById("childSelect");
-
             const childrenSnapshot = await getDocs(collection(db, "children"));
             childrenSnapshot.forEach((docSnap) => {
                 const childData = docSnap.data();
@@ -56,6 +55,7 @@
             });
 
             if (ages.length > 0) {
+                ages.sort((a, b) => a - b);
                 createHeightChart(ages, heights);
             } else {
                 alert("No growth records found for the selected child.");
@@ -67,10 +67,10 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: xData, // X-axis values (Age in months)
+                    labels: xData,
                     datasets: [{
                         label: 'Height (cm)',
-                        data: yData, // Y-axis values (Height)
+                        data: yData,
                         fill: false,
                         borderColor: 'rgb(75, 192, 192)',
                         tension: 0.1
@@ -118,7 +118,6 @@
         <br><br>
         <button class="button button-primary" onclick="window.location.href='growth-graph.html'">← Back to Growth Dashboard</button>
         <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
-        
     </div>
 </body>
 </html>
