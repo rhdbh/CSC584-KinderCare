@@ -92,10 +92,9 @@
                 }
             }
         }
-
         function editMilestone(milestoneId) {
-            window.location.href = `edit-milestone.html?id=${milestoneId}`;
-        }
+        window.location.href = `edit-milestone.html?milestoneId=${milestoneId}`;
+}
 
         document.addEventListener("DOMContentLoaded", loadMilestones);
         window.deleteMilestone = deleteMilestone;
