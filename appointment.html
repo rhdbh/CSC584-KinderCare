@@ -23,6 +23,25 @@
         .table tr:hover {
             background-color: #f1f1f1;
         }
+        .button {
+            padding: 5px 10px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .button-primary {
+            background-color: #28a745;
+            color: white;
+        }
+        .button-secondary {
+            background-color: #dc3545;
+            color: white;
+        }
+        .button-complete {
+            background-color: #ffc107;
+            color: black;
+        }
     </style>
 </head>
 <body>
@@ -52,55 +71,4 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
-            authDomain: "kindercare-cd7da.firebaseapp.com",
-            projectId: "kindercare-cd7da",
-            storageBucket: "kindercare-cd7da.firebasestorage.app",
-            messagingSenderId: "930908122510",
-            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        async function loadAppointment() {
-            const appointmentSnapshot = await getDocs(collection(db, "appointment"));
-            const tableBody = document.querySelector("#appointmentTable tbody");
-            tableBody.innerHTML = "";
-
-            if (appointmentSnapshot.empty) {
-                tableBody.innerHTML = `<tr><td colspan="8">No appointment found.</td></tr>`;
-                return;
-            }
-
-            appointmentSnapshot.forEach((appointmentDoc) => {
-                const appointment = appointmentDoc.data();
-                let appointmentDateString = appointment.appointmentDate?.toDate ? appointment.appointmentDate.toDate().toDateString() : "N/A";
-                
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${appointment.childName || "N/A"}</td>
-                    <td>${appointment.appointmentType || "N/A"}</td>
-                    <td>${appointment.status || "N/A"}</td>
-                    <td>${appointment.healthcareProvider || "N/A"}</td>
-                    <td>${appointmentDateString}</td>
-                    <td>${appointment.appointmentTime || "N/A"}</td>
-                    <td>${appointment.remark || "N/A"}</td>
-                    <td>
-                        <button class="button" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
-                        <button class="button button-secondary" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
-                        ${appointment.status === "Pending" || appointment.status === "Rescheduled" ? `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>` : ""}
-                    </td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", loadAppointment);
-    </script>
-</body>
-</html>
+        // Import
