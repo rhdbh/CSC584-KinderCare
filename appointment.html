@@ -5,71 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Appointment List | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-    
     <style>
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-}
-
-.table th, .table td {
-    border: 1px solid #ddd;
-    text-align: center;
-    padding: 10px;
-}
-
-.table th {
-    background-color: #007BFF;
-    color: white;
-}
-
-.table tr:hover {
-     background-color: #f1f1f1;
-}
-        
-        .button {
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-            margin: 5px;
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
         }
-
-        .button-primary {
-            background-color: #007bff;
+        .table th, .table td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 10px;
+        }
+        .table th {
+            background-color: #007BFF;
             color: white;
         }
-        .button-primary:hover {
-            background-color: #0056b3;
-            color: white;
-        }
-
-        .button-secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        .button-secondary:hover {
-            background-color: #5a6268;
-            color: white;
-        }
-
-        .button-complete {
-            background-color: #28a745;
-            color: white;
-        }
-        .button-complete:hover {
-            background-color: #19692c;
-            color: white;
-        }
-
-        .button-reschedule {
-            background-color: #FF00FF;
-            color: white;
-        }
-        .button-reschedule:hover {
-            background-color: #BA55D3;
-            color: white;
+        .table tr:hover {
+            background-color: #f1f1f1;
         }
     </style>
 </head>
@@ -89,7 +41,11 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                <tr id="noDataRow">
+                    <td colspan="8">No appointment found.</td>
+                </tr>
+            </tbody>
         </table><br>
         <button class="button button-primary" onclick="window.location.href='add-appointment.html'">+ Add Appointment</button>
         <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
@@ -116,40 +72,16 @@
             const tableBody = document.querySelector("#appointmentTable tbody");
             tableBody.innerHTML = "";
 
+            if (appointmentSnapshot.empty) {
+                tableBody.innerHTML = `<tr><td colspan="8">No appointment found.</td></tr>`;
+                return;
+            }
+
             appointmentSnapshot.forEach((appointmentDoc) => {
                 const appointment = appointmentDoc.data();
-                let appointmentDateString = "N/A";
-
-                if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
-                    appointmentDateString = appointment.appointmentDate.toDate().toDateString();
-                }
-
-                let actionButtons = `
-                    <button class="button" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
-                    <button class="button button-secondary" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
-                `;
-
-                if (appointment.status === "Pending" || appointment.status === "Rescheduled") {
-                    actionButtons += `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>`;
-                }
-
+                let appointmentDateString = appointment.appointmentDate?.toDate ? appointment.appointmentDate.toDate().toDateString() : "N/A";
+                
                 const row = document.createElement("tr");
-
-                if (appointment.status === "Rescheduled") {
-                    row.style.backgroundColor = "#FFF8DC";
-                } else if (appointment.status === "Completed") {
-                    row.style.backgroundColor = "#DFFFD6";
-                } else if (appointment.status === "Missed") {
-                    row.style.backgroundColor = "#FF2400";
-                } else if (appointment.appointmentDate && appointment.appointmentDate.toDate) {
-                    const appointmentDate = appointment.appointmentDate.toDate();
-                    const daysLeft = Math.floor((appointmentDate - new Date()) / (1000 * 60 * 60 * 24));
-
-                    if (daysLeft <= 3) {
-                        row.style.backgroundColor = "#FFCCE5";
-                    }
-                }
-
                 row.innerHTML = `
                     <td>${appointment.childName || "N/A"}</td>
                     <td>${appointment.appointmentType || "N/A"}</td>
@@ -158,54 +90,14 @@
                     <td>${appointmentDateString}</td>
                     <td>${appointment.appointmentTime || "N/A"}</td>
                     <td>${appointment.remark || "N/A"}</td>
-                    <td>${actionButtons}</td>
+                    <td>
+                        <button class="button" data-id="${appointmentDoc.id}" data-action="edit">Edit</button>
+                        <button class="button button-secondary" data-id="${appointmentDoc.id}" data-action="delete">Delete</button>
+                        ${appointment.status === "Pending" || appointment.status === "Rescheduled" ? `<button class="button button-complete" data-id="${appointmentDoc.id}" data-action="complete">Completed</button>` : ""}
+                    </td>
                 `;
-
                 tableBody.appendChild(row);
             });
-
-            document.querySelectorAll("button[data-id]").forEach(button => {
-                button.addEventListener("click", async (event) => {
-                    const id = event.target.getAttribute("data-id");
-                    const action = event.target.getAttribute("data-action");
-
-                    if (action === "edit") {
-                        editAppointment(id);
-                    } else if (action === "delete") {
-                        await deleteAppointment(id);
-                    } else if (action === "complete") {
-                        await markAsCompleted(id);
-                    }
-                });
-            });
-        }
-
-        async function deleteAppointment(id) {
-            if (confirm("Are you sure you want to delete this appointment?")) {
-                try {
-                    await deleteDoc(doc(db, "appointment", id));
-                    alert("Appointment deleted successfully.");
-                    loadAppointment();
-                } catch (error) {
-                    console.error("Error deleting appointment:", error);
-                    alert("Error deleting appointment.");
-                }
-            }
-        }
-
-        async function markAsCompleted(id) {
-            try {
-                await updateDoc(doc(db, "appointment", id), { status: "Completed" });
-                alert("Appointment marked as completed.");
-                loadAppointment();
-            } catch (error) {
-                console.error("Error updating appointment:", error);
-                alert("Error updating appointment.");
-            }
-        }
-
-        function editAppointment(id) {
-            window.location.href = `edit-appointment.html?id=${id}`;
         }
 
         document.addEventListener("DOMContentLoaded", loadAppointment);
