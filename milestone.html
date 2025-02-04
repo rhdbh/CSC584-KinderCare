@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milestones | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css"> 
+</head>
+<body>
+    <div class="container">
+        <h1>Child Milestones</h1>
+
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Child Name</th>
+                    <th>Date Achieved</th>
+                    <th>Milestone Type</th>
+                    <th>Remark</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="milestoneTableBody">
+                <tr>
+                    <td colspan="5">Loading milestones...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button onclick="window.location.href='add-milestone.html'">Add Milestone</button>
+        <button onclick="window.location.href='dashboard.html'">← Back</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadMilestones() {
+            const tableBody = document.getElementById("milestoneTableBody");
+            tableBody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
+
+            const milestonesSnapshot = await getDocs(collection(db, "milestones"));
+            tableBody.innerHTML = ""; // Clear loading text
+
+            if (milestonesSnapshot.empty) {
+                tableBody.innerHTML = "<tr><td colspan='5'>No milestones found.</td></tr>";
+                return;
+            }
+
+            for (const milestoneDoc of milestonesSnapshot.docs) {
+                const milestoneData = milestoneDoc.data();
+                const childId = milestoneData.childId;
+
+                // Fetch child's name from children collection
+                const childSnapshot = await getDoc(doc(db, "children", childId));
+                const childName = childSnapshot.exists() ? childSnapshot.data().ChildName : "Unknown";
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${childName}</td>
+                    <td>${milestoneData.dateAchieved}</td>
+                    <td>${milestoneData.milestoneType}</td>
+                    <td>${milestoneData.remark || "—"}</td>
+                    <td>
+                        <button onclick="editMilestone('${milestoneDoc.id}')">Edit</button>
+                        <button onclick="deleteMilestone('${milestoneDoc.id}')">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            }
+        }
+
+        async function deleteMilestone(milestoneId) {
+            if (confirm("Are you sure you want to delete this milestone?")) {
+                await deleteDoc(doc(db, "milestones", milestoneId));
+                alert("Milestone deleted successfully.");
+                loadMilestones(); // Refresh the list
+            }
+        }
+
+        function editMilestone(milestoneId) {
+            window.location.href = `edit-milestone.html?milestoneId=${milestoneId}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", loadMilestones);
+    </script>
+</body>
+</html>
