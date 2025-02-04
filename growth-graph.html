@@ -5,153 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Growth Dashboard | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import Chart from 'https://cdn.jsdelivr.net/npm/chart.js';
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
-            authDomain: "kindercare-cd7da.firebaseapp.com",
-            projectId: "kindercare-cd7da",
-            storageBucket: "kindercare-cd7da.firebasestorage.app",
-            messagingSenderId: "930908122510",
-            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        async function loadChildren() {
-            const childrenDropdown = document.getElementById("childSelect");
-
-            const childrenSnapshot = await getDocs(collection(db, "children"));
-            childrenSnapshot.forEach((docSnap) => {
-                const childData = docSnap.data();
-                const option = document.createElement("option");
-                option.value = docSnap.id;
-                option.textContent = childData.ChildName;
-                childrenDropdown.appendChild(option);
-            });
-        }
-
-        async function loadGrowthData() {
-            const childId = document.getElementById("childSelect").value;
-            const graphType = document.getElementById("graphTypeSelect").value;
-
-            if (!childId || !graphType) {
-                alert("Please select a child and graph type.");
-                return;
-            }
-
-            try {
-                const growthSnapshot = await getDocs(collection(db, "growth"));
-                const growthData = [];
-
-                growthSnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    if (data.childId === childId) {
-                        growthData.push({
-                            age: data.age,
-                            height: data.height,
-                            weight: data.weight
-                        });
-                    }
-                });
-
-                if (growthData.length === 0) {
-                    alert("No growth records found for this child.");
-                    return;
-                }
-
-                // Sort the data in increasing order of age (smallest age to largest)
-                growthData.sort((a, b) => a.age - b.age);
-
-                const xData = growthData.map(item => item.age);
-                const yData = graphType === 'weight' ? growthData.map(item => item.weight) : growthData.map(item => item.height);
-
-                renderChart(xData, yData, graphType);
-            } catch (error) {
-                console.error("Error fetching growth records:", error);
-            }
-        }
-
-        function renderChart(xData, yData, graphType) {
-            const ctx = document.getElementById("growthChart").getContext("2d");
-
-            if (window.chart) {
-                window.chart.destroy(); // Destroy the previous chart instance if it exists
-            }
-
-            window.chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: xData,
-                    datasets: [{
-                        label: graphType === 'weight' ? 'Weight vs Age' : 'Height vs Age',
-                        data: yData,
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        tension: 0.1,
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // Adjust graph size to prevent scrolling
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Age (Months)'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: graphType === 'weight' ? 'Weight (kg)' : 'Height (cm)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadChildren();
-            document.getElementById("loadDataButton").addEventListener("click", loadGrowthData);
-        });
-
-    </script>
-
     <style>
-        #growthChart {
-            width: 100%;
-            height: 300px; /* Adjust graph size */
+<head>
+    <style>
+        .card {
+            width: 150px;
+            text-align: center;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .card-img {
+            width: 80px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <h1>Growth Dashboard</h1>
-
-        <label for="childSelect">Select Child:</label>
-        <select id="childSelect" required>
-            <option value="">-- Select Child --</option>
-        </select>
-        <br><br>
-
-        <label for="graphTypeSelect">Select Graph Type:</label>
-        <select id="graphTypeSelect" required>
-            <option value="height">Height vs Age</option>
-            <option value="weight">Weight vs Age</option>
-        </select>
-        <br><br>
-
-        <button type="button" id="loadDataButton">Show Graph</button>
+        <h2>Growth Dashboard</h2>
+        <h3>Please select dashboard type to proceed.</h3>
         
-        <br><br>
-        <canvas id="growthChart"></canvas>
+<div class="card-container">
+    <div class="card">
+        <a href="height-dashboard.html">
+        <img class="card-img" src="img/height.png" alt="Height"></a>
+        <p><b>HEIGHT</b></p>
+    </div>
+    <div class="card-container">
+    <div class="card">
+        <a href="weight-dashboard.html">
+        <img class="card-img" src="img/weight.png" alt="Weight"></a>
+        <p><b>WEIGHT</b></p>
+    </div>
+</div>
+</body>
+</html>
     </div>
 </body>
 </html>
