@@ -54,6 +54,7 @@
 
             if (growthData.length > 0) {
                 growthData.sort((a, b) => a.age - b.age);
+                
                 const sortedAges = growthData.map(item => item.age);
                 const sortedHeights = growthData.map(item => item.height);
 
@@ -114,7 +115,7 @@
         <button type="button" class="button" onclick="displayHeightGraph()">Show Height Data</button>
 
         <div>
-            <canvas id="heightChart" width="500" height="200"></canvas>
+            <canvas id="heightChart" width="500" height="100"></canvas>
         </div>
         <br><br>
         <button class="button button-primary" onclick="window.location.href='growth-graph.html'">← Back to Growth Dashboard</button>
