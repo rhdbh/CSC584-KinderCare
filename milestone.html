@@ -46,72 +46,53 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-async function loadMilestones() {
-    const tableBody = document.getElementById("milestoneTableBody");
-    tableBody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
+        async function loadMilestones() {
+            const tableBody = document.getElementById("milestoneTableBody");
+            tableBody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
 
-    const milestonesSnapshot = await getDocs(collection(db, "milestones"));
-    tableBody.innerHTML = "";
+            const milestonesSnapshot = await getDocs(collection(db, "milestones"));
+            tableBody.innerHTML = "";
 
-    if (milestonesSnapshot.empty) {
-        tableBody.innerHTML = "<tr><td colspan='5'>No milestones found.</td></tr>";
-        return;
-    }
+            if (milestonesSnapshot.empty) {
+                tableBody.innerHTML = "<tr><td colspan='5'>No milestones found.</td></tr>";
+                return;
+            }
 
-    for (const milestoneDoc of milestonesSnapshot.docs) {
-        const milestoneData = milestoneDoc.data();
-        const childId = milestoneData.childId;
+            for (const milestoneDoc of milestonesSnapshot.docs) {
+                const milestoneData = milestoneDoc.data();
+                const childId = milestoneData.childId;
 
-        const childSnapshot = await getDoc(doc(db, "children", childId));
-        const childName = childSnapshot.exists() ? childSnapshot.data().ChildName : "Unknown";
+                const childSnapshot = await getDoc(doc(db, "children", childId));
+                const childName = childSnapshot.exists() ? childSnapshot.data().ChildName : "Unknown";
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${childName}</td>
-            <td>${milestoneData.dateAchieved}</td>
-            <td>${milestoneData.milestoneType}</td>
-            <td>${milestoneData.remark || "—"}</td>
-            <td>
-                <button class="button edit-btn" data-id="${milestoneDoc.id}">Edit</button>
-                <button class="button button-secondary delete-btn" data-id="${milestoneDoc.id}">Delete</button>
-            </td>
-        `;
-        tableBody.appendChild(row);
-    }
-
-    // Attach event listeners for edit and delete buttons
-    document.querySelectorAll(".edit-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            const milestoneId = this.dataset.id;
-            editMilestone(milestoneId);
-        });
-    });
-
-    document.querySelectorAll(".delete-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            const milestoneId = this.dataset.id;
-            deleteMilestone(milestoneId);
-        });
-    });
-}
-
-async function deleteMilestone(milestoneId) {
-    if (confirm("Are you sure you want to delete this milestone?")) {
-        try {
-            await deleteDoc(doc(db, "milestones", milestoneId)); // Correct collection name
-            alert("Milestone deleted successfully.");
-            loadMilestones(); // Refresh the table
-        } catch (error) {
-            console.error("Error deleting milestone:", error);
+                const row = document.createElement("tr");
+                row.innerHTML = 
+                    <td>${childName}</td>
+                    <td>${milestoneData.dateAchieved}</td>
+                    <td>${milestoneData.milestoneType}</td>
+                    <td>${milestoneData.remark || "—"}</td>
+                    <td>
+                    <button class="button" data-id="${milestoneDoc.id}" data-action="edit">Edit</button>
+                    <button class="button button-secondary" data-id="${milestoneDoc.id}" data-action="delete">Delete</button>
+                    </td>
+                ;
+                tableBody.appendChild(row);
+            }
         }
-    }
-}
 
-function editMilestone(milestoneId) {
-    window.location.href = `edit-milestone.html?milestoneId=${milestoneId}`;
-}
+        async function deleteMilestone(milestoneId) {
+            if (confirm("Are you sure you want to delete this milestone?")) {
+                await deleteDoc(doc(db, "milestone", milestoneId));
+                alert("Milestone deleted successfully.");
+                loadMilestones(); 
+            }
+        }
 
-document.addEventListener("DOMContentLoaded", loadMilestones);
-        /script>
-        /body>
-            /html>
+        function editMilestone(milestoneId) {
+            window.location.href = edit-milestone.html?milestoneId=${milestoneId};
+        }
+
+        document.addEventListener("DOMContentLoaded", loadMilestones);
+    </script>
+</body>
+</html>
