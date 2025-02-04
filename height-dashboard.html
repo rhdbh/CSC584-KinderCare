@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Height vs Age | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Function to load children in the dropdown
+        async function loadChildren() {
+            const childrenDropdown = document.getElementById("childSelect");
+
+            const childrenSnapshot = await getDocs(collection(db, "children"));
+            childrenSnapshot.forEach((docSnap) => {
+                const childData = docSnap.data();
+                const option = document.createElement("option");
+                option.value = docSnap.id;
+                option.textContent = childData.ChildName;
+                childrenDropdown.appendChild(option);
+            });
+        }
+
+        // Function to fetch and display growth data for the selected child (Height vs Age)
+        async function displayHeightGraph() {
+            const childId = document.getElementById("childSelect").value;
+
+            if (!childId) {
+                alert("Please select a child.");
+                return;
+            }
+
+            const growthQuery = query(collection(db, "growth"), where("childId", "==", childId));
+            const growthSnapshot = await getDocs(growthQuery);
+
+            const ages = [];
+            const heights = [];
+
+            growthSnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                ages.push(data.age);
+                heights.push(data.height);
+            });
+
+            if (ages.length > 0) {
+                createHeightChart(ages, heights);
+            } else {
+                alert("No growth records found for the selected child.");
+            }
+        }
+
+        // Function to create the Height vs Age chart
+        function createHeightChart(xData, yData) {
+            const ctx = document.getElementById("heightChart").getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xData, // X-axis values (Age in months)
+                    datasets: [{
+                        label: 'Height (cm)',
+                        data: yData, // Y-axis values (Height)
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Age (Months)'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Height (cm)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadChildren();
+            document.getElementById("childSelect").addEventListener("change", displayHeightGraph);
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Height vs Age Dashboard</h1>
+        <label for="childSelect">Select Child:</label>
+        <select id="childSelect" required>
+            <option value="">-- Select Child --</option>
+        </select>
+        <br><br>
+        <button type="button" class="button" onclick="displayHeightGraph()">Show Height Data</button>
+
+        <div>
+            <h2>Height vs. Age</h2>
+            <canvas id="heightChart" width="400" height="200"></canvas>
+        </div>
+    </div>
+</body>
+</html>
