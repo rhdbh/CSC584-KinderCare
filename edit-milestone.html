@@ -43,24 +43,57 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Get the milestone ID from the URL query parameter
         const urlParams = new URLSearchParams(window.location.search);
         const milestoneId = urlParams.get("milestoneId");
 
         async function loadMilestone() {
-            const milestoneRef = doc(db, "milestone", milestoneId);
+            if (!milestoneId) {
+                alert("Milestone ID is missing from the URL.");
+                return;
+            }
+
+            const milestoneRef = doc(db, "milestones", milestoneId); // Corrected collection name
             const milestoneSnap = await getDoc(milestoneRef);
 
             if (milestoneSnap.exists()) {
                 const data = milestoneSnap.data();
-                document.getElementById("date").value = data.date;
-                document.getElementById("milestoneType").value = data.milestoneType;
-                document.getElementById("remark").value = data.remark || "";
+                document.getElementById("date").value = data.dateAchieved; // Pre-fill date
+                document.getElementById("milestoneType").value = data.milestoneType; // Pre-fill milestone type
+                document.getElementById("remark").value = data.remark || ""; // Pre-fill remark
 
-                const childSnap = await getDoc(doc(db, "children", data.childId));
+                // Fetch child name based on the childId in the milestone
+                const childRef = doc(db, "children", data.childId);
+                const childSnap = await getDoc(childRef);
                 if (childSnap.exists()) {
-                    document.getElementById("childName").value = childSnap.data().ChildName;
+                    document.getElementById("childName").value = childSnap.data().ChildName; // Pre-fill child name
                 }
+            } else {
+                alert("Milestone not found!");
             }
         }
 
-        document.getElementById("editMilestoneForm").addEventListener("s
+        // Event listener for form submission
+        document.getElementById("editMilestoneForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const date = document.getElementById("date").value;
+            const milestoneType = document.getElementById("milestoneType").value;
+            const remark = document.getElementById("remark").value;
+
+            const milestoneRef = doc(db, "milestones", milestoneId);
+            await updateDoc(milestoneRef, {
+                dateAchieved: date,
+                milestoneType: milestoneType,
+                remark: remark
+            });
+
+            alert("Milestone updated successfully.");
+            window.location.href = "milestone.html"; // Redirect back to the milestone list
+        });
+
+        // Load milestone data when the page is loaded
+        document.addEventListener("DOMContentLoaded", loadMilestone);
+    </script>
+</body>
+</html>
