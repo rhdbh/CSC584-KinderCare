@@ -82,7 +82,7 @@
 
         async function deleteMilestone(milestoneId) {
             if (confirm("Are you sure you want to delete this milestone?")) {
-                await deleteDoc(doc(db, "milestone", milestoneId));
+                await deleteDoc(doc(db, "milestones", milestoneId));
                 alert("Milestone deleted successfully.");
                 loadMilestones(); 
             }
