@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weight vs Age | KinderCare</title>
+    <title>Weight Graph | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
@@ -21,11 +21,11 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        let weightChartInstance = null; // Store the chart instance
 
-        // Function to load children in the dropdown
+        // Load children into dropdown
         async function loadChildren() {
             const childrenDropdown = document.getElementById("childSelect");
-
             const childrenSnapshot = await getDocs(collection(db, "children"));
             childrenSnapshot.forEach((docSnap) => {
                 const childData = docSnap.data();
@@ -36,44 +36,53 @@
             });
         }
 
-        // Function to fetch and display growth data for the selected child (Weight vs Age)
+        // Display the weight graph when a child is selected
         async function displayWeightGraph() {
             const childId = document.getElementById("childSelect").value;
 
             if (!childId) {
-                alert("Please select a child.");
-                return;
+                return; // Do nothing if no child is selected
             }
 
             const growthQuery = query(collection(db, "growth"), where("childId", "==", childId));
             const growthSnapshot = await getDocs(growthQuery);
 
-            const ages = [];
-            const weights = [];
+            const growthData = [];
 
             growthSnapshot.forEach((docSnap) => {
                 const data = docSnap.data();
-                ages.push(data.age);
-                weights.push(data.weight);
+                growthData.push({ age: data.age, weight: data.weight });
             });
 
-            if (ages.length > 0) {
-                createWeightChart(ages, weights);
+            if (growthData.length > 0) {
+                growthData.sort((a, b) => a.age - b.age);
+
+                const filteredGrowthData = growthData.filter(item => item.age !== undefined && item.weight !== undefined);
+
+                const sortedAges = filteredGrowthData.map(item => item.age);
+                const sortedWeights = filteredGrowthData.map(item => item.weight);
+
+                // Destroy previous chart instance if it exists
+                if (weightChartInstance) {
+                    weightChartInstance.destroy();
+                }
+
+                createWeightChart(sortedAges, sortedWeights); // Create the new chart
             } else {
                 alert("No growth records found for the selected child.");
             }
         }
 
-        // Function to create the Weight vs Age chart
+        // Create the weight chart
         function createWeightChart(xData, yData) {
             const ctx = document.getElementById("weightChart").getContext('2d');
-            new Chart(ctx, {
+            weightChartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: xData, // X-axis values (Age in months)
+                    labels: xData,
                     datasets: [{
                         label: 'Weight (kg)',
-                        data: yData, // Y-axis values (Weight)
+                        data: yData,
                         fill: false,
                         borderColor: 'rgb(75, 192, 192)',
                         tension: 0.1
@@ -92,6 +101,9 @@
                             title: {
                                 display: true,
                                 text: 'Weight (kg)'
+                            },
+                            ticks: {
+                                stepSize: 1, // Adjusting weight axis increment to 1kg
                             }
                         }
                     }
@@ -99,6 +111,7 @@
             });
         }
 
+        // Event listener for dropdown change to automatically update the graph
         document.addEventListener("DOMContentLoaded", () => {
             loadChildren();
             document.getElementById("childSelect").addEventListener("change", displayWeightGraph);
@@ -107,22 +120,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Weight vs Age Dashboard</h1>
-        <label for="childSelect">Select Child:</label>
+        <h1>Weight Graph</h1>
+        <label for="childSelect">Weight graph for:</label>
         <select id="childSelect" required>
             <option value="">-- Select Child --</option>
         </select>
-        <br><br>
-        <button type="button" class="button" onclick="displayWeightGraph()">Show Weight Data</button>
 
         <div>
-            <h2>Weight vs. Age</h2>
-            <canvas id="weightChart" width="400" height="200"></canvas>
+            <canvas id="weightChart" width="500" height="100"></canvas>
         </div>
-
+        <br><br>
         <button class="button button-primary" onclick="window.location.href='growth-graph.html'">← Back to Growth Dashboard</button>
         <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
-        
     </div>
 </body>
 </html>
