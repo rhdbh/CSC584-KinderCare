@@ -71,4 +71,97 @@
     </div>
 
     <script type="module">
-        // Import
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebaseapp.com",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Load appointments from Firestore
+        async function loadAppointment() {
+            const appointmentSnapshot = await getDocs(collection(db, "appointment"));
+            const tableBody = document.querySelector("#appointmentTable tbody");
+            tableBody.innerHTML = "";
+
+            if (appointmentSnapshot.empty) {
+                tableBody.innerHTML = `<tr><td colspan="8">No appointment found.</td></tr>`;
+                return;
+            }
+
+            appointmentSnapshot.forEach((appointmentDoc) => {
+                const appointment = appointmentDoc.data();
+                let appointmentDateString = appointment.appointmentDate?.toDate ? appointment.appointmentDate.toDate().toDateString() : "N/A";
+
+                // Create a new row
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${appointment.childName || "N/A"}</td>
+                    <td>${appointment.appointmentType || "N/A"}</td>
+                    <td>${appointment.status || "N/A"}</td>
+                    <td>${appointment.healthcareProvider || "N/A"}</td>
+                    <td>${appointmentDateString}</td>
+                    <td>${appointment.appointmentTime || "N/A"}</td>
+                    <td>${appointment.remark || "N/A"}</td>
+                    <td>
+                        <button class="button edit-btn" data-id="${appointmentDoc.id}">Edit</button>
+                        <button class="button button-secondary delete-btn" data-id="${appointmentDoc.id}">Delete</button>
+                        ${appointment.status === "Pending" || appointment.status === "Rescheduled" ? `<button class="button button-complete complete-btn" data-id="${appointmentDoc.id}">Completed</button>` : ""}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Handle button clicks using event delegation
+        document.querySelector("#appointmentTable").addEventListener("click", async (event) => {
+            const button = event.target;
+            const appointmentId = button.dataset.id;
+
+            // Edit button clicked
+            if (button.classList.contains("edit-btn")) {
+                window.location.href = `edit-appointment.html?id=${appointmentId}`;
+            }
+
+            // Delete button clicked
+            if (button.classList.contains("delete-btn")) {
+                const confirmDelete = confirm("Are you sure you want to delete this appointment?");
+                if (confirmDelete) {
+                    try {
+                        await deleteDoc(doc(db, "appointment", appointmentId));
+                        alert("Appointment deleted successfully.");
+                        loadAppointment(); // Refresh the table
+                    } catch (error) {
+                        console.error("Error deleting appointment:", error);
+                    }
+                }
+            }
+
+            // Mark as completed button clicked
+            if (button.classList.contains("complete-btn")) {
+                try {
+                    await updateDoc(doc(db, "appointment", appointmentId), { status: "Completed" });
+                    alert("Appointment marked as completed.");
+                    loadAppointment(); // Refresh the table
+                } catch (error) {
+                    console.error("Error updating appointment:", error);
+                }
+            }
+        });
+
+        // Load appointments when the page loads
+        document.addEventListener("DOMContentLoaded", loadAppointment);
+    </script>
+</body>
+</html>
