@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Milestone | KinderCare</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Milestone</h1>
+        <form id="editMilestoneForm">
+            <label>Child Name:</label>
+            <input type="text" id="childName" disabled>
+
+            <label for="date">Date Achieved:</label>
+            <input type="date" id="date" required>
+
+            <label for="milestoneType">Milestone Type:</label>
+            <input type="text" id="milestoneType" required>
+
+            <label for="remark">Remark:</label>
+            <input type="text" id="remark">
+
+            <button type="submit" class="button">Update Milestone</button>
+            <button type="button" class="button button-secondary" onclick="window.location.href='milestones.html'">&larr; Cancel</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
+            authDomain: "kindercare-cd7da.firebaseapp.com",
+            projectId: "kindercare-cd7da",
+            storageBucket: "kindercare-cd7da.firebasestorage.app",
+            messagingSenderId: "930908122510",
+            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const milestoneId = urlParams.get("milestoneId");
+
+        async function loadMilestone() {
+            const milestoneRef = doc(db, "milestone", milestoneId);
+            const milestoneSnap = await getDoc(milestoneRef);
+
+            if (milestoneSnap.exists()) {
+                const data = milestoneSnap.data();
+                document.getElementById("date").value = data.date;
+                document.getElementById("milestoneType").value = data.milestoneType;
+                document.getElementById("remark").value = data.remark || "";
+
+                const childSnap = await getDoc(doc(db, "children", data.childId));
+                if (childSnap.exists()) {
+                    document.getElementById("childName").value = childSnap.data().ChildName;
+                }
+            }
+        }
+
+        document.getElementById("editMilestoneForm").addEventListener("s
