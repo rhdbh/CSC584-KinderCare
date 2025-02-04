@@ -21,9 +21,8 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let heightChartInstance = null; // Store the chart instance
+        let heightChartInstance = null;
 
-        // Load children into dropdown
         async function loadChildren() {
             const childrenDropdown = document.getElementById("childSelect");
             const childrenSnapshot = await getDocs(collection(db, "children"));
@@ -36,12 +35,11 @@
             });
         }
 
-        // Display the height graph when a child is selected
         async function displayHeightGraph() {
             const childId = document.getElementById("childSelect").value;
 
             if (!childId) {
-                return; // Do nothing if no child is selected
+                return;
             }
 
             const growthQuery = query(collection(db, "growth"), where("childId", "==", childId));
@@ -62,7 +60,7 @@
                 const sortedAges = filteredGrowthData.map(item => item.age);
                 const sortedHeights = filteredGrowthData.map(item => item.height);
 
-                // Destroy previous chart instance if it exists
+
                 if (heightChartInstance) {
                     heightChartInstance.destroy();
                 }
