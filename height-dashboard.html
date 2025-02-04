@@ -21,8 +21,9 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        let heightChartInstance = null;
+        let heightChartInstance = null; // Store the chart instance
 
+        // Load children into dropdown
         async function loadChildren() {
             const childrenDropdown = document.getElementById("childSelect");
             const childrenSnapshot = await getDocs(collection(db, "children"));
@@ -35,13 +36,12 @@
             });
         }
 
+        // Display the height graph when a child is selected
         async function displayHeightGraph() {
             const childId = document.getElementById("childSelect").value;
-            console.log("Child ID:", childId);
 
             if (!childId) {
-                alert("Please select a child.");
-                return;
+                return; // Do nothing if no child is selected
             }
 
             const growthQuery = query(collection(db, "growth"), where("childId", "==", childId));
@@ -62,18 +62,18 @@
                 const sortedAges = filteredGrowthData.map(item => item.age);
                 const sortedHeights = filteredGrowthData.map(item => item.height);
 
-                console.log("Sorted Ages:", sortedAges);
-                console.log("Sorted Heights:", sortedHeights);
-
+                // Destroy previous chart instance if it exists
                 if (heightChartInstance) {
-                    heightChartInstance.destroy(); // Destroy the existing chart instance
+                    heightChartInstance.destroy();
                 }
-                createHeightChart(sortedAges, sortedHeights);
+
+                createHeightChart(sortedAges, sortedHeights); // Create the new chart
             } else {
                 alert("No growth records found for the selected child.");
             }
         }
 
+        // Create the height chart
         function createHeightChart(xData, yData) {
             const ctx = document.getElementById("heightChart").getContext('2d');
             heightChartInstance = new Chart(ctx, {
@@ -111,14 +111,10 @@
             });
         }
 
+        // Event listener for dropdown change to automatically update the graph
         document.addEventListener("DOMContentLoaded", () => {
             loadChildren();
-            document.getElementById("childSelect").addEventListener("change", () => {
-                // Clear the existing chart before generating a new one
-                if (heightChartInstance) {
-                    heightChartInstance.destroy();
-                }
-            });
+            document.getElementById("childSelect").addEventListener("change", displayHeightGraph);
         });
     </script>
 </head>
@@ -129,11 +125,9 @@
         <select id="childSelect" required>
             <option value="">-- Select Child --</option>
         </select>
-        <br><br>
-        <button type="button" class="button" onclick="displayHeightGraph()">Show Height Data</button>
 
         <div>
-            <canvas id="heightChart" width="500" height="300"></canvas>
+            <canvas id="heightChart" width="500" height="100"></canvas>
         </div>
         <br><br>
         <button class="button button-primary" onclick="window.location.href='growth-graph.html'">← Back to Growth Dashboard</button>
