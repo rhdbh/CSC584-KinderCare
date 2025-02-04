@@ -9,8 +9,7 @@
 <body>
     <div class="container">
         <h1>Child Milestones</h1>
-        <table class="table">
-        <table border="1">
+        <table class="table" border="1">
             <thead>
                 <tr>
                     <th>Child Name</th>
@@ -27,9 +26,8 @@
             </tbody>
         </table>
             <br>
-
-        <button onclick="window.location.href='add-milestone.html'">Add Milestone</button>
-        <button onclick="window.location.href='dashboard.html'">← Back</button>
+        <button class="button" onclick="window.location.href='add-milestone.html'">+ Add Milestone</button>
+        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
     </div>
 
     <script type="module">
@@ -53,7 +51,7 @@
             tableBody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
 
             const milestonesSnapshot = await getDocs(collection(db, "milestones"));
-            tableBody.innerHTML = ""; // Clear loading text
+            tableBody.innerHTML = "";
 
             if (milestonesSnapshot.empty) {
                 tableBody.innerHTML = "<tr><td colspan='5'>No milestones found.</td></tr>";
