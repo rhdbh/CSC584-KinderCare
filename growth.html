@@ -34,6 +34,11 @@
                 childrenMap[childDoc.id] = childDoc.data();
             });
 
+            if (growthSnapshot.empty) {
+                growthTable.innerHTML = `<tr><td colspan='5' style='text-align: center;'>No growth record found</td></tr>`;
+                return;
+            }
+
             growthSnapshot.forEach((docSnap) => {
                 const growth = docSnap.data();
                 const growthId = docSnap.id;
@@ -90,7 +95,9 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="growthTable"></tbody>
+            <tbody id="growthTable">
+                <tr><td colspan='5' style='text-align: center;'>Loading...</td></tr>
+            </tbody>
         </table>
         <br>
         <button class="button" onclick="window.location.href='add-growth.html'">+ Add Growth</button>
