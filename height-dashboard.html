@@ -60,18 +60,16 @@
                 const sortedAges = filteredGrowthData.map(item => item.age);
                 const sortedHeights = filteredGrowthData.map(item => item.height);
 
-
                 if (heightChartInstance) {
                     heightChartInstance.destroy();
                 }
 
-                createHeightChart(sortedAges, sortedHeights); // Create the new chart
+                createHeightChart(sortedAges, sortedHeights);
             } else {
                 alert("No growth records found for the selected child.");
             }
         }
 
-        // Create the height chart
         function createHeightChart(xData, yData) {
             const ctx = document.getElementById("heightChart").getContext('2d');
             heightChartInstance = new Chart(ctx, {
@@ -101,7 +99,7 @@
                                 text: 'Height (cm)'
                             },
                             ticks: {
-                                stepSize: 5
+                                stepSize: 5,
                             }
                         }
                     }
@@ -109,7 +107,6 @@
             });
         }
 
-        // Event listener for dropdown change to automatically update the graph
         document.addEventListener("DOMContentLoaded", () => {
             loadChildren();
             document.getElementById("childSelect").addEventListener("change", displayHeightGraph);
@@ -122,10 +119,9 @@
         <label for="childSelect">Height graph for:</label>
         <select id="childSelect" required>
             <option value="">-- Select Child --</option>
-        </select>
-
+        </select><br>
         <div>
-            <canvas id="heightChart" width="500" height="100"></canvas>
+            <canvas id="heightChart" width="500" height="300"></canvas>
         </div>
         <br><br>
         <button class="button button-primary" onclick="window.location.href='growth-graph.html'">← Back to Growth Dashboard</button>
