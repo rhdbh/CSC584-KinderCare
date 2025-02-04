@@ -1,126 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vaccine Records | KinderCare</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .button-complete {
-            background-color: #28a745;
-            color: white;
-        }
-        .button-complete:hover {
-            background-color: #19692c;
-            color: white;
-        }
-    </style>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+async function loadVaccineRecords() {
+    const vaccineTable = document.getElementById("vaccineTable");
+    vaccineTable.innerHTML = "";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAYkRSxHjVrV9QYk45EDP5K2uHOoW-0pkk",
-            authDomain: "kindercare-cd7da.firebaseapp.com",
-            projectId: "kindercare-cd7da",
-            storageBucket: "kindercare-cd7da.firebasestorage.app",
-            messagingSenderId: "930908122510",
-            appId: "1:930908122510:web:40f89ca7a5cf8dc3fb48df"
-        };
+    const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
+    const childrenSnapshot = await getDocs(collection(db, "children"));
+    const childrenMap = {};
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    childrenSnapshot.forEach((childDoc) => {
+        childrenMap[childDoc.id] = childDoc.data().ChildName;
+    });
 
-        async function loadVaccineRecords() {
-            const vaccineTable = document.getElementById("vaccineTable");
-            vaccineTable.innerHTML = "";
+    if (vaccineSnapshot.empty) {
+        vaccineTable.innerHTML = `<tr><td colspan="5" style="text-align: center;">No vaccination record found.</td></tr>`;
+        return;
+    }
 
-            const vaccineSnapshot = await getDocs(collection(db, "vaccine"));
-            const childrenSnapshot = await getDocs(collection(db, "children"));
-            const childrenMap = {};
+    vaccineSnapshot.forEach((docSnap) => {
+        const vaccine = docSnap.data();
+        const vaccineId = docSnap.id;
+        const childName = childrenMap[vaccine.childId] || "Unknown";
 
-            childrenSnapshot.forEach((childDoc) => {
-                childrenMap[childDoc.id] = childDoc.data().ChildName;
-            });
+        const row = document.createElement("tr");
 
-            vaccineSnapshot.forEach((docSnap) => {
-                const vaccine = docSnap.data();
-                const vaccineId = docSnap.id;
-                const childName = childrenMap[vaccine.childId] || "Unknown";
-
-                const row = document.createElement("tr");
-
-                if (vaccine.status === 'Completed') {
-                    row.style.backgroundColor = '#d4edda';
-                }
-
-                row.innerHTML = `
-                    <td>${childName}</td>
-                    <td>${vaccine.status}</td>
-                    <td>${vaccine.vaccineDate}</td>
-                    <td>${vaccine.vaccineType}</td>
-                    <td>
-                        <button class="button" onclick="editVaccine('${vaccineId}')">Edit</button>
-                        <button class="button button-secondary" onclick="deleteVaccine('${vaccineId}')">Delete</button>
-                        <button class="button button-complete" onclick="completeVaccine('${vaccineId}')" ${vaccine.status === 'Completed' ? 'style="display:none"' : ''}>Complete</button>
-                    </td>
-                `;
-                vaccineTable.appendChild(row);
-            });
+        if (vaccine.status === 'Completed') {
+            row.style.backgroundColor = '#d4edda';
         }
 
-        async function deleteVaccine(vaccineId) {
-            const confirmDelete = confirm("Are you sure you want to delete this record?");
-            if (confirmDelete) {
-                try {
-                    await deleteDoc(doc(db, "vaccine", vaccineId));
-                    alert("Vaccine record deleted successfully.");
-                    loadVaccineRecords();
-                } catch (error) {
-                    console.error("Error deleting record:", error);
-                }
-            }
-        }
-
-        async function completeVaccine(vaccineId) {
-            try {
-                await updateDoc(doc(db, "vaccine", vaccineId), {
-                    status: "Completed"
-                });
-                loadVaccineRecords();
-            } catch (error) {
-                console.error("Error updating vaccine status:", error);
-            }
-        }
-
-        function editVaccine(vaccineId) {
-            window.location.href = `edit-vaccine.html?id=${vaccineId}`;
-        }
-
-        document.addEventListener("DOMContentLoaded", loadVaccineRecords);
-        window.deleteVaccine = deleteVaccine;
-        window.editVaccine = editVaccine;
-        window.completeVaccine = completeVaccine;
-    </script>
-</head>
-<body>
-    <div class="container">
-        <h1>Vaccine Records</h1>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Child Name</th>
-                    <th>Status</th>
-                    <th>Vaccine Date</th>
-                    <th>Vaccine Type</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="vaccineTable"></tbody>
-        </table>
-        <br>
-        <button class="button" onclick="window.location.href='add-vaccine.html'">+ Add Vaccine</button>
-        <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
-    </div>
-</body>
-</html>
+        row.innerHTML = `
+            <td>${childName}</td>
+            <td>${vaccine.status}</td>
+            <td>${vaccine.vaccineDate}</td>
+            <td>${vaccine.vaccineType}</td>
+            <td>
+                <button class="button" onclick="editVaccine('${vaccineId}')">Edit</button>
+                <button class="button button-secondary" onclick="deleteVaccine('${vaccineId}')">Delete</button>
+                <button class="button button-complete" onclick="completeVaccine('${vaccineId}')" ${vaccine.status === 'Completed' ? 'style="display:none"' : ''}>Complete</button>
+            </td>
+        `;
+        vaccineTable.appendChild(row);
+    });
+}
