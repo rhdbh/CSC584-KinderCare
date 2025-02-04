@@ -62,7 +62,7 @@
                 const sortedHeights = filteredGrowthData.map(item => item.height);
 
                 if (heightChartInstance) {
-                    heightChartInstance.destroy(); // Destroy the existing chart instance
+                    heightChartInstance.destroy();
                 }
                 createHeightChart(sortedAges, sortedHeights);
             } else {
@@ -110,7 +110,6 @@
         document.addEventListener("DOMContentLoaded", () => {
             loadChildren();
             document.getElementById("childSelect").addEventListener("change", () => {
-                // Clear the existing chart before generating a new one
                 if (heightChartInstance) {
                     heightChartInstance.destroy();
                 }
