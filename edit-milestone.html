@@ -43,9 +43,10 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Get the milestone ID from the URL query parameter
         const urlParams = new URLSearchParams(window.location.search);
         const milestoneId = urlParams.get("milestoneId");
+
+        console.log(milestoneId);
 
         async function loadMilestone() {
             if (!milestoneId) {
@@ -53,27 +54,24 @@
                 return;
             }
 
-            const milestoneRef = doc(db, "milestones", milestoneId); // Corrected collection name
+            const milestoneRef = doc(db, "milestone", milestoneId);
             const milestoneSnap = await getDoc(milestoneRef);
 
             if (milestoneSnap.exists()) {
                 const data = milestoneSnap.data();
-                document.getElementById("date").value = data.dateAchieved; // Pre-fill date
-                document.getElementById("milestoneType").value = data.milestoneType; // Pre-fill milestone type
-                document.getElementById("remark").value = data.remark || ""; // Pre-fill remark
-
-                // Fetch child name based on the childId in the milestone
+                document.getElementById("date").value = data.dateAchieved;
+                document.getElementById("milestoneType").value = data.milestoneType;
+                document.getElementById("remark").value = data.remark || "";
                 const childRef = doc(db, "children", data.childId);
                 const childSnap = await getDoc(childRef);
                 if (childSnap.exists()) {
-                    document.getElementById("childName").value = childSnap.data().ChildName; // Pre-fill child name
+                    document.getElementById("childName").value = childSnap.data().ChildName;
                 }
             } else {
                 alert("Milestone not found!");
             }
         }
 
-        // Event listener for form submission
         document.getElementById("editMilestoneForm").addEventListener("submit", async function (e) {
             e.preventDefault();
 
@@ -89,10 +87,9 @@
             });
 
             alert("Milestone updated successfully.");
-            window.location.href = "milestone.html"; // Redirect back to the milestone list
+            window.location.href = "milestone.html";
         });
 
-        // Load milestone data when the page is loaded
         document.addEventListener("DOMContentLoaded", loadMilestone);
     </script>
 </body>
