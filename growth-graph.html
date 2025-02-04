@@ -38,7 +38,7 @@
 
         async function loadGrowthData() {
             const childId = document.getElementById("childSelect").value;
-            const graphType = document.querySelector('input[name="graphType"]:checked').value;
+            const graphType = document.getElementById("graphTypeSelect").value;
 
             if (!childId || !graphType) {
                 alert("Please select a child and graph type.");
@@ -132,19 +132,18 @@
             </select>
             <br><br>
 
-            <label for="graphType">Select Graph Type:</label>
-            <input type="radio" name="graphType" value="height" id="heightGraph" checked>
-            <label for="heightGraph">Height vs Age</label>
-            <input type="radio" name="graphType" value="weight" id="weightGraph">
-            <label for="weightGraph">Weight vs Age</label>
+            <label for="graphTypeSelect">Select Graph Type:</label>
+            <select id="graphTypeSelect" required>
+                <option value="">-- Select Graph Type --</option>
+                <option value="height">Height vs Age</option>
+                <option value="weight">Weight vs Age</option>
+            </select>
             <br><br>
 
             <button type="button" class="button" onclick="loadGrowthData()">Show Graph</button>
         </form>
 
-        <canvas id="growthChart" width="300" height="200"></canvas>
-
-       <button class="button button-secondary" onclick="window.location.href='dashboard.html'">← Back to Dashboard</button>
+        <canvas id="growthChart" width="300" height="150"></canvas> <!-- Reduced the graph size -->
     </div>
 </body>
 </html>
