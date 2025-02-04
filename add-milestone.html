@@ -17,8 +17,8 @@
             </select>
             <br>
             
-            <label for="dateAchieved">Date Achieved</label>
-            <input type="date" id="dateAchieved" name="dateAchieved" required>
+            <label for="date">Date Achieved</label>
+            <input type="date" id="date" name="date" required>
     
             <label for="milestoneType">Milestone Type</label>
             <select id="milestoneType" name="milestoneType" required>
@@ -63,6 +63,7 @@
                 const option = document.createElement("option");
                 option.value = docSnap.id;
                 option.textContent = childData.ChildName;
+                option.dataset.childName = childData.ChildName;
                 childrenDropdown.appendChild(option);
             });
         }
@@ -73,17 +74,25 @@
         addMilestoneForm.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const selectedChildId = document.getElementById("childSelect").value;
+            const selectedChild = document.getElementById("childSelect");
+            const selectedChildId = selectedChild.value;
+            const selectedChildName = selectedChild.options[selectedChild.selectedIndex].dataset.childName || "Unknown";
+
+            if (!selectedChildId) {
+                alert("Please select a child.");
+                return;
+            }
 
             const newMilestone = {
                 childId: selectedChildId,
-                dateAchieved: document.getElementById("dateAchieved").value,
+                childName: selectedChildName,
+                date: document.getElementById("date").value,
                 milestoneType: document.getElementById("milestoneType").value,
                 remark: document.getElementById("remark").value || ""
             };
 
             try {
-                const milestoneRef = doc(collection(db, "milestones"));
+                const milestoneRef = doc(collection(db, "milestone"));
                 await setDoc(milestoneRef, newMilestone);
 
                 alert("Milestone added successfully.");
