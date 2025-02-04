@@ -54,9 +54,12 @@
 
             if (growthData.length > 0) {
                 growthData.sort((a, b) => a.age - b.age);
-                
-                const sortedAges = growthData.map(item => item.age);
-                const sortedHeights = growthData.map(item => item.height);
+
+                // Filter out months that have no data
+                const filteredGrowthData = growthData.filter(item => item.age !== undefined && item.height !== undefined);
+
+                const sortedAges = filteredGrowthData.map(item => item.age);
+                const sortedHeights = filteredGrowthData.map(item => item.height);
 
                 createHeightChart(sortedAges, sortedHeights);
             } else {
@@ -69,10 +72,10 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: xData,
+                    labels: xData,  // Use only available ages
                     datasets: [{
                         label: 'Height (cm)',
-                        data: yData,
+                        data: yData,  // Plot the heights for the available data
                         fill: false,
                         borderColor: 'rgb(75, 192, 192)',
                         tension: 0.1
