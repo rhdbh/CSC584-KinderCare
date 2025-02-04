@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Height vs Age | KinderCare</title>
+    <title>Height Graph | KinderCare</title>
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module">
@@ -22,7 +22,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Function to load children in the dropdown
         async function loadChildren() {
             const childrenDropdown = document.getElementById("childSelect");
 
@@ -36,7 +35,6 @@
             });
         }
 
-        // Function to fetch and display growth data for the selected child (Height vs Age)
         async function displayHeightGraph() {
             const childId = document.getElementById("childSelect").value;
 
@@ -64,7 +62,6 @@
             }
         }
 
-        // Function to create the Height vs Age chart
         function createHeightChart(xData, yData) {
             const ctx = document.getElementById("heightChart").getContext('2d');
             new Chart(ctx, {
@@ -107,8 +104,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>Height vs Age Dashboard</h1>
-        <label for="childSelect">Select Child:</label>
+        <h1>Height Graph</h1>
+        <label for="childSelect">Height graph for:</label>
         <select id="childSelect" required>
             <option value="">-- Select Child --</option>
         </select>
@@ -116,8 +113,7 @@
         <button type="button" class="button" onclick="displayHeightGraph()">Show Height Data</button>
 
         <div>
-            <h2>Height vs. Age</h2>
-            <canvas id="heightChart" width="400" height="200"></canvas>
+            <canvas id="heightChart" width="500" height="100"></canvas>
         </div>
         <br><br>
         <button class="button button-primary" onclick="window.location.href='growth-graph.html'">← Back to Growth Dashboard</button>
