@@ -65,8 +65,8 @@
                     return;
                 }
 
-                // Sort the data in descending order of age
-                growthData.sort((a, b) => b.age - a.age);
+                // Sort the data in increasing order of age (smallest age to largest)
+                growthData.sort((a, b) => a.age - b.age);
 
                 const xData = growthData.map(item => item.age);
                 const yData = graphType === 'weight' ? growthData.map(item => item.weight) : growthData.map(item => item.height);
@@ -98,6 +98,7 @@
                 },
                 options: {
                     responsive: true,
+                    maintainAspectRatio: false, // Adjust graph size to prevent scrolling
                     scales: {
                         x: {
                             title: {
@@ -116,34 +117,41 @@
             });
         }
 
-        document.addEventListener("DOMContentLoaded", loadChildren);
-
-        window.loadGrowthData = loadGrowthData;
+        document.addEventListener("DOMContentLoaded", () => {
+            loadChildren();
+            document.getElementById("loadDataButton").addEventListener("click", loadGrowthData);
+        });
 
     </script>
+
+    <style>
+        #growthChart {
+            width: 100%;
+            height: 300px; /* Adjust graph size */
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Growth Dashboard</h1>
-        <form id="growthForm">
-            <label for="childSelect">Select Child:</label>
-            <select id="childSelect" required>
-                <option value="">-- Select Child --</option>
-            </select>
-            <br><br>
 
-            <label for="graphTypeSelect">Select Graph Type:</label>
-            <select id="graphTypeSelect" required>
-                <option value="">-- Select Graph Type --</option>
-                <option value="height">Height vs Age</option>
-                <option value="weight">Weight vs Age</option>
-            </select>
-            <br><br>
+        <label for="childSelect">Select Child:</label>
+        <select id="childSelect" required>
+            <option value="">-- Select Child --</option>
+        </select>
+        <br><br>
 
-            <button type="button" class="button" onclick="loadGrowthData()">Show Graph</button>
-        </form>
+        <label for="graphTypeSelect">Select Graph Type:</label>
+        <select id="graphTypeSelect" required>
+            <option value="height">Height vs Age</option>
+            <option value="weight">Weight vs Age</option>
+        </select>
+        <br><br>
 
-        <canvas id="growthChart" width="300" height="150"></canvas> <!-- Reduced the graph size -->
+        <button type="button" id="loadDataButton">Show Graph</button>
+        
+        <br><br>
+        <canvas id="growthChart"></canvas>
     </div>
 </body>
 </html>
